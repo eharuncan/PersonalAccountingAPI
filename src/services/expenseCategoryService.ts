@@ -1,72 +1,210 @@
 import { ExpenseCategory } from "../domain/expenseCategory";
 
-export class ExpenseCategoryService {
-    private expenseCategoryListDB: Array<ExpenseCategory>;
-    private defaultExpenseCategories: string[] = ["Çocuk", "Güvenlik", "Kitap", "Sağlık"];
 
-    constructor(expenseCategoryListDB: Array<ExpenseCategory>) {
-        this.expenseCategoryListDB = expenseCategoryListDB;
-    }
+// type GetExpenseCategoriesResponse = {
+//     data: ExpenseCategory[];
+// };
 
-    public getExpenseCategories(): Array<ExpenseCategory> {
-        return this.expenseCategoryListDB;
-    }
 
-    public getExpenseCategoriesByUserId(userId: number): Array<ExpenseCategory> {
-        let resultList;
-        resultList = this.expenseCategoryListDB.filter((expenseCategory) => expenseCategory.userId === userId);
-        return resultList;
-    }
-
-    public getExpenseCategoryByUserIdAndExpenseCategoryId(userId: number, expenseCategoryId: number): ExpenseCategory {
-        let resultList;
-        resultList = this.expenseCategoryListDB.filter((expenseCategory) => expenseCategory.userId === userId && expenseCategory.id === expenseCategoryId);
-        return resultList[0];
-    }
-
-    public addExpenseCategory(userId: number, expenseCategoryName: string): boolean {
-        let newExpenseCategoryId;
-        let expenseCategoryList = this.getExpenseCategoriesByUserId(userId);
-        if (expenseCategoryList.length == 0) {
-            newExpenseCategoryId = 1;
-        } else {
-            let lastExpenseCategory = expenseCategoryList[expenseCategoryList.length - 1];
-            newExpenseCategoryId = lastExpenseCategory.id + 1;
-        }
-
-        let expenseCategory = new ExpenseCategory(userId, newExpenseCategoryId, expenseCategoryName);
-        this.expenseCategoryListDB.push(expenseCategory);
-        return true;
-    }
-
-    public editExpenseCategory(userId: number, id: number, editedName: string): boolean {
-        let expenseCategory = this.getExpenseCategoryByUserIdAndExpenseCategoryId(userId, id);
-        let index = this.getExpenseCategories().indexOf(expenseCategory);
-        let editedExpenseCategory = new ExpenseCategory(userId, id, editedName);
-        this.expenseCategoryListDB[index] = editedExpenseCategory;
-        console.log("editedExpenseCategory", editedExpenseCategory);
-        return true;
-    }
-
-    public deleteExpenseCategory(userId: number, expenseCategoryId: number): boolean {
-        let foundExpenseCategory = this.getExpenseCategoryByUserIdAndExpenseCategoryId(userId, expenseCategoryId);
-        let index = this.expenseCategoryListDB.indexOf(foundExpenseCategory, 0);
-        if (index > -1) {
-            this.expenseCategoryListDB.splice(index, 1);
-        }
-        return true;
-    }
-
-    public addDefaultExpenseCategories(userId: number) {
-
-        // for (String expenseCategory:defaultExpenseCategories) {
-        //     this.addExpenseCategory(userId,expenseCategory );
-        // }
-
-        this.defaultExpenseCategories.forEach(expenseCategory => {
-            this.addExpenseCategory(userId, expenseCategory);
+async function APIgetExpenseCategoriesByUserId(userId: number): Promise<ExpenseCategory[]> {
+    try {
+        const response = await window.fetch("http://localhost:3001/api/v1/categories/" + userId, {
+            method: "GET",
+            headers: {
+                Accept: "application/json"
+            }
         });
 
-        return true;
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const result = (await response.json());
+
+        console.log("result is: ", JSON.stringify(result, null, 4));
+
+        return <ExpenseCategory[]>JSON.parse(JSON.stringify(result, null, 4));
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log('error message: ', error.message);
+            return error.message as any;
+        } else {
+            console.log('unexpected error: ', error);
+            return 'An unexpected error occurred' as any;
+        }
     }
+}
+
+async function APIgetExpenseCategoryByUserIdAndExpenseCategoryId(categoryId: number, expenseCategoryId: number): Promise<ExpenseCategory> {
+    try {
+        const response = await window.fetch("http://localhost:3001/api/v1/categories/", {
+            method: "GET",
+            headers: {
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                categoryId: categoryId,
+                expenseCategoryId: expenseCategoryId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const result = (await response.json());
+
+        // console.log("result is: ", JSON.stringify(result, null, 4));
+
+        return <ExpenseCategory>JSON.parse(JSON.stringify(result, null, 4));
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log('error message: ', error.message);
+            return error.message as any;
+        } else {
+            console.log('unexpected error: ', error);
+            return 'An unexpected error occurred' as any;
+        }
+    }
+}
+
+async function APIaddExpenseCategory(userId: number, expenseCategoryName: string): Promise<boolean> {
+    try {
+        const response = await window.fetch("http://localhost:3001/api/v1/categories/", {
+            method: "POST",
+            headers: {
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                userId: userId,
+                expenseCategoryName: expenseCategoryName
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const result = (await response.json());
+
+        // console.log("result is: ", JSON.stringify(result, null, 4));
+
+        return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log('error message: ', error.message);
+            return error.message as any;
+        } else {
+            console.log('unexpected error: ', error);
+            return 'An unexpected error occurred' as any;
+        }
+    }
+}
+
+async function APIeditExpenseCategory(userId: number, id: number, editedName: string): Promise<boolean> {
+    try {
+        const response = await window.fetch("http://localhost:3001/api/v1/categories/", {
+            method: "PUT",
+            headers: {
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                userId: userId,
+                id: id,
+                editedName: editedName
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const result = (await response.json());
+
+        // console.log("result is: ", JSON.stringify(result, null, 4));
+
+        return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log('error message: ', error.message);
+            return error.message as any;
+        } else {
+            console.log('unexpected error: ', error);
+            return 'An unexpected error occurred' as any;
+        }
+    }
+}
+
+async function APIdeleteExpenseCategory(userId: number, expenseCategoryId: number): Promise<boolean> {
+    try {
+        const response = await window.fetch("http://localhost:3001/api/v1/categories/", {
+            method: "DELETE",
+            headers: {
+                Accept: "application/json"
+            },
+            body: JSON.stringify({
+                userId: userId,
+                expenseCategoryId: expenseCategoryId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error! status: ${response.status}`);
+        }
+
+        const result = (await response.json());
+
+        // console.log("result is: ", JSON.stringify(result, null, 4));
+
+        return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+
+    } catch (error) {
+        if (error instanceof Error) {
+            console.log('error message: ', error.message);
+            return error.message as any;
+        } else {
+            console.log('unexpected error: ', error);
+            return 'An unexpected error occurred' as any;
+        }
+    }
+}
+
+
+
+
+
+
+export class ExpenseCategoryService {
+
+    // private defaultExpenseCategories: string[] = ["Çocuk", "Güvenlik", "Kitap", "Sağlık"];
+
+
+    constructor() {
+        // this.expenseCategoryListDB = expenseCategoryListDB;
+    }
+
+    public getExpenseCategoriesByUserId(userId: number): Promise<ExpenseCategory[]> {
+        return APIgetExpenseCategoriesByUserId(userId);
+    }
+
+    public getExpenseCategoryByUserIdAndExpenseCategoryId(userId: number, expenseCategoryId: number): Promise<ExpenseCategory> {
+        return APIgetExpenseCategoryByUserIdAndExpenseCategoryId(userId, expenseCategoryId);
+    }
+
+    public addExpenseCategory(userId: number, expenseCategoryName: string): Promise<boolean> {
+        return APIaddExpenseCategory(userId, expenseCategoryName);
+    }
+
+    public editExpenseCategory(userId: number, id: number, editedName: string): Promise<boolean> {
+        return APIeditExpenseCategory(userId, id, editedName);
+    }
+
+    public deleteExpenseCategory(userId: number, expenseCategoryId: number): Promise<boolean> {
+        return APIdeleteExpenseCategory(userId, expenseCategoryId);
+    }
+
 }

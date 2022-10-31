@@ -39,15 +39,15 @@ export class UserService {
         let newUserId;
         let userList = this.userListDB;
         if (userList.length == 0) {
-            newUserId = 1;
+            newUserId = 0;
         } else {
             let lastUser = userList[userList.length - 1];
             newUserId = lastUser.id + 1;
         }
 
-        if (!expenseCategoryService.addDefaultExpenseCategories(newUserId)) {
-            return false;
-        }
+        // if (!expenseCategoryService.addDefaultExpenseCategories(newUserId)) {
+        //     return false;
+        // }
 
         let selectedUserType;
         if (name == "admin") {
@@ -78,7 +78,7 @@ export class UserService {
     }
 
     public deleteUser(userId: number): boolean {
-        if (userId == 1) {
+        if (userId == 0) {
             return false;
         } else {
             let foundUser = this.getUserById(userId);

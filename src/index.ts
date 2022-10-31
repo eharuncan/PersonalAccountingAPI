@@ -18,8 +18,8 @@ function connectDatabase(): Database {
   }
 }
 
-function startServices(database: Database) {
-  expenseCategoryService = new ExpenseCategoryService(database.expenseCategoryList);
+function startServices() {
+  expenseCategoryService = new ExpenseCategoryService();
   userService = new UserService(database.userList);
   expenseService = new ExpenseService(database.expenseList);
 }
@@ -31,7 +31,8 @@ if (database == null) {
 else {
   console.log("Database'e bağlanma işlemi başarılı.");
 }
-startServices(database);
+
+startServices();
 
 const mainButton = <HTMLButtonElement>document.querySelector("#main-button");
 
@@ -74,6 +75,8 @@ const editProfileButton2 = <HTMLButtonElement>document.querySelector("#edit-prof
 const editProfileSaveButton = <HTMLButtonElement>document.querySelector("#edit-profile-save-button");
 
 const logoutButton = <HTMLButtonElement>document.querySelector("#logout-button");
+
+
 
 function refreshMenus() {
   const mainMenu = <HTMLDivElement>document.querySelector("#main-menu");
@@ -126,14 +129,14 @@ registerButton.addEventListener("click", handleRegisterClick);
 const handleRegisterSaveClick = () => {
   const registerForm = document.getElementById("register-form");
   if (registerForm != null) {
-    registerForm.onsubmit = () => {
+    registerForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>registerForm);
       const name = formData.get("register-name") as string;
       const surname = formData.get("register-surname") as string;
       const email = formData.get("register-email") as string;
       const password = formData.get("register-password") as string;
       const retypedPassword = formData.get("register-retyped-password") as string;
-      if (userService.register(name, surname, email, password, retypedPassword)) {
+      if (await userService.register(name, surname, email, password, retypedPassword)) {
         console.log("Kayıt işlemi başarılı.");
         refreshMenus();
         window.location.replace("#show-expenses-page");
@@ -155,11 +158,11 @@ loginButton.addEventListener("click", handleLoginClick);
 const handleLoginSaveClick = () => {
   const loginForm = document.getElementById("login-form");
   if (loginForm != null) {
-    loginForm.onsubmit = () => {
+    loginForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>loginForm);
       const email = formData.get("login-email") as string;
       const password = formData.get("login-password") as string;
-      if (userService.login(email, password)) {
+      if (await userService.login(email, password)) {
         console.log("Oturum açma işlemi başarılı.");
         refreshMenus();
         handleShowExpensesClick();
@@ -187,7 +190,7 @@ function removeAllChildNodes(parent: HTMLDivElement) {
   }
 }
 
-function showUsers(elementId: string){
+async function showUsers(elementId: string){
   const userList = <HTMLDivElement>document.querySelector(elementId);
   removeAllChildNodes(userList);
 
@@ -207,7 +210,7 @@ function showUsers(elementId: string){
     divElementEmail.innerText = "Eposta adresi";
     userList.appendChild(divElementEmail);
 
-  let users = userService.getUsers();
+  let users = await userService.getUsers();
   for (let index = 0; index < users.length; index++) {
     let divElementId = document.createElement("div");
     divElementId.innerText = users[index].id.toString();
@@ -227,7 +230,7 @@ function showUsers(elementId: string){
   }
 }
 
-function showUserExpenses(elementId: string){
+async function showUserExpenses(elementId: string){
   const userExpenseList = <HTMLDivElement>document.querySelector(elementId);
   removeAllChildNodes(userExpenseList);
     let divElementId = document.createElement("div");
@@ -250,7 +253,7 @@ function showUserExpenses(elementId: string){
     divElementCategory.innerText = "Kategorisi";
     userExpenseList.appendChild(divElementCategory);
 
-  let userExpenses = expenseService.getExpensesByUserId(userService.currentUser.id);
+  let userExpenses = await expenseService.getExpensesByUserId(userService.currentUser.id);
   for (let index = 0; index < userExpenses.length; index++) {
     let divElementId = document.createElement("div");
     divElementId.innerText = userExpenses[index].id.toString();
@@ -269,15 +272,15 @@ function showUserExpenses(elementId: string){
     userExpenseList.appendChild(divElementDate);
 
     let divElementCategory = document.createElement("div");
-    divElementCategory.innerText = expenseCategoryService.getExpenseCategoryByUserIdAndExpenseCategoryId(userService.currentUser.id, userExpenses[index].categoryId).name;
+    divElementCategory.innerText = (await expenseCategoryService.getExpenseCategoryByUserIdAndExpenseCategoryId(userService.currentUser.id, userExpenses[index].categoryId)).name;
     userExpenseList.appendChild(divElementCategory);
   }
 }
 
-function showUserExpenseCategories(elementId: string){
+async function showUserExpenseCategories(elementId: string){
   const userCategoryList = <HTMLDivElement>document.querySelector(elementId);
   removeAllChildNodes(userCategoryList);
-  let userCategories = expenseCategoryService.getExpenseCategoriesByUserId(userService.currentUser.id);
+  let userCategories = await expenseCategoryService.getExpenseCategoriesByUserId(userService.currentUser.id);
 
     let divElementId = document.createElement("div");
     divElementId.innerText = "Kategori ID";
@@ -314,10 +317,10 @@ deleteUserButton2.addEventListener("click", handleDeleteUserClick);
 const handleDeleteUserSaveClick = () => {
   const deleteUserForm = document.getElementById("delete-user-form");
   if (deleteUserForm != null) {
-    deleteUserForm.onsubmit = () => {
+    deleteUserForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>deleteUserForm);
       const id = formData.get("delete-user-id") as string;
-      if (userService.deleteUser(Number(id))) {
+      if (await userService.deleteUser(Number(id))) {
         console.log("Kullanıcı silme işlemi başarılı.");
         handleShowUsersClick();
         window.location.replace("#show-users-page");
@@ -348,13 +351,13 @@ addExpenseButton2.addEventListener("click", handleAddExpenseClick);
 const handleAddExpenseSaveClick = () => {
   const addExpenseForm = document.getElementById("add-expense-form");
   if (addExpenseForm != null) {
-    addExpenseForm.onsubmit = () => {
+    addExpenseForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>addExpenseForm);
       const name = formData.get("add-expense-name") as string;
       const amount = formData.get("add-expense-amount") as string;
       const date = formData.get("add-expense-date") as string;
       const categoryId = formData.get("add-expense-category") as string;
-      if (expenseService.addExpense(userService.currentUser.id, name, BigInt(amount), new Date(date), Number(categoryId))) {
+      if (await expenseService.addExpense(userService.currentUser.id, name, BigInt(amount), new Date(date), Number(categoryId))) {
         console.log("Harcama ekleme işlemi başarılı.");
         handleShowExpensesClick();
         window.location.replace("#show-expenses-page");
@@ -379,14 +382,14 @@ editExpenseButton2.addEventListener("click", handleEditExpenseClick);
 const handleEditExpenseSaveClick = () => {
   const editExpenseForm = document.getElementById("edit-expense-form");
   if (editExpenseForm != null) {
-    editExpenseForm.onsubmit = () => {
+    editExpenseForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>editExpenseForm);
       const id = formData.get("edit-expense-id") as string;
       const editedName = formData.get("edit-expense-name") as string;
       const editedAmount = formData.get("edit-expense-amount") as string;
       const editedDate = formData.get("edit-expense-date") as string;
       const editedCategoryId = formData.get("edit-expense-category-id") as string;
-      if (expenseService.editExpense(userService.currentUser.id, Number(id), editedName, BigInt(editedAmount), new Date(editedDate), Number(editedCategoryId) )) {
+      if (await expenseService.editExpense(userService.currentUser.id, Number(id), editedName, BigInt(editedAmount), new Date(editedDate), Number(editedCategoryId) )) {
         console.log("Harcama güncelleme işlemi başarılı.");
         handleShowExpensesClick();
         window.location.replace("#show-expenses-page");
@@ -409,10 +412,10 @@ deleteExpenseButton2.addEventListener("click", handleDeleteExpenseClick);
 const handleDeleteExpenseSaveClick = () => {
   const deleteExpenseForm = document.getElementById("delete-expense-form");
   if (deleteExpenseForm != null) {
-    deleteExpenseForm.onsubmit = () => {
+    deleteExpenseForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>deleteExpenseForm);
       const id = formData.get("delete-expense-id") as string;
-      if (expenseService.deleteExpense(userService.currentUser.id, Number(id))) {
+      if (await expenseService.deleteExpense(userService.currentUser.id, Number(id))) {
         console.log("Harcama silme işlemi başarılı.");
         handleShowExpensesClick();
         window.location.replace("#show-expenses-page");
@@ -440,10 +443,10 @@ addCategoryButton2.addEventListener("click", handleAddCategoryClick);
 const handleAddCategorySaveClick = () => {
   const addCategoryForm = document.getElementById("add-category-form");
   if (addCategoryForm != null) {
-    addCategoryForm.onsubmit = () => {
+    addCategoryForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>addCategoryForm);
       const name = formData.get("add-category-name") as string;
-      if (expenseCategoryService.addExpenseCategory(userService.currentUser.id, name)) {
+      if (await expenseCategoryService.addExpenseCategory(userService.currentUser.id, name)) {
         console.log("Kategori ekleme işlemi başarılı.");
         handleShowCategoriesClick();
       } else {
@@ -466,11 +469,11 @@ editCategoryButton2.addEventListener("click", handleEditCategoryClick);
 const handleEditCategorySaveClick = () => {
   const editCategoryForm = document.getElementById("edit-category-form");
   if (editCategoryForm != null) {
-    editCategoryForm.onsubmit = () => {
+    editCategoryForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>editCategoryForm);
       const id = formData.get("edit-category-id") as string;
       const editedName = formData.get("edit-category-name") as string;
-      if (expenseCategoryService.editExpenseCategory(userService.currentUser.id, Number(id), editedName)) {
+      if (await expenseCategoryService.editExpenseCategory(userService.currentUser.id, Number(id), editedName)) {
         console.log("Kategori güncelleme işlemi başarılı.");
         handleShowCategoriesClick();
         window.location.replace("#show-categories-page");
@@ -493,10 +496,10 @@ deleteCategoryButton2.addEventListener("click", handleDeleteCategoryClick);
 const handleDeleteCategorySaveClick = () => {
   const deleteCategoryForm = document.getElementById("delete-category-form");
   if (deleteCategoryForm != null) {
-    deleteCategoryForm.onsubmit = () => {
+    deleteCategoryForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>deleteCategoryForm);
       const id = formData.get("delete-category-id") as string;
-      if (expenseCategoryService.deleteExpenseCategory(userService.currentUser.id, Number(id))) {
+      if (await expenseCategoryService.deleteExpenseCategory(userService.currentUser.id, Number(id))) {
         console.log("Kategori silme işlemi başarılı.");
         handleShowCategoriesClick();
         window.location.replace("#show-categories-page");
@@ -534,14 +537,14 @@ editProfileButton2.addEventListener("click", handleEditProfileClick);
 const handleEditProfileSaveClick = () => {
   const editProfileForm = document.getElementById("edit-profile-form");
   if (editProfileForm != null) {
-    editProfileForm.onsubmit = () => {
+    editProfileForm.onsubmit = async () => {
       const formData = new FormData(<HTMLFormElement>editProfileForm);
       const editedName = formData.get("edit-profile-name") as string;
       const editedSurname = formData.get("edit-profile-surname") as string;
       const editedEmail = formData.get("edit-profile-email") as string;
       const editedPassword = formData.get("edit-profile-password") as string;
       const retypedPassword = formData.get("edit-profile-retyped-password") as string;
-      if (userService.editUser(userService.currentUser.id, editedName, editedSurname, editedEmail, editedPassword, retypedPassword)) {
+      if (await userService.editUser(userService.currentUser.id, editedName, editedSurname, editedEmail, editedPassword, retypedPassword)) {
         console.log("Kullanıcı güncelleme işlemi başarılı.");
         handleShowProfileClick();
         window.location.replace("#show-profile-page");
@@ -554,8 +557,8 @@ const handleEditProfileSaveClick = () => {
 }
 editProfileSaveButton.addEventListener("click", handleEditProfileSaveClick);
 
-const handleLogoutClick = () => {
-  if (userService.logout()) {
+const handleLogoutClick = async () => {
+  if (await userService.logout()) {
     console.log("Oturum kapatma işlemi başarılı.");
     refreshMenus();
     window.location.replace("#");

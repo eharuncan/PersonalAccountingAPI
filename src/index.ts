@@ -1,5 +1,3 @@
-import { Database } from "./db/database";
-
 import { ExpenseCategoryService } from "./services/expenseCategoryService";
 import { UserService } from "./services/userService";
 import { ExpenseService } from "./services/expenseService";
@@ -8,28 +6,10 @@ export let expenseCategoryService: ExpenseCategoryService;
 export let userService: UserService;
 export let expenseService: ExpenseService;
 
-function connectDatabase(): Database {
-  let username = "admin";
-  let password = "admin";
-  if (Database.connect(username, password)) {
-    return new Database();
-  } else {
-    return null as any;
-  }
-}
-
 function startServices() {
   expenseCategoryService = new ExpenseCategoryService();
-  userService = new UserService(database.userList);
-  expenseService = new ExpenseService(database.expenseList);
-}
-
-let database = connectDatabase();
-if (database == null) {
-  console.log("Hata: Database'e bağlanma işlemi başarısız.");
-}
-else {
-  console.log("Database'e bağlanma işlemi başarılı.");
+  userService = new UserService();
+  expenseService = new ExpenseService();
 }
 
 startServices();
@@ -160,11 +140,10 @@ const handleLoginSaveClick = () => {
       const formData = new FormData(<HTMLFormElement>loginForm);
       const email = formData.get("login-email") as string;
       const password = formData.get("login-password") as string;
-      if (await userService.login(email, password)) {
+
+      if (await userService.login(email, password) != null) {
         console.log("Oturum açma işlemi başarılı.");
         refreshMenus();
-        handleShowExpensesClick();
-        e.preventDefault();
         if(userService.currentUser.type == "CUSTOMER"){
           window.location.replace("#show-expenses-page");
           handleShowExpensesClick();
@@ -208,6 +187,7 @@ async function showUsers(elementId: string){
     userList.appendChild(divElementEmail);
 
   let users = await userService.getUsers();
+  console.log(users);
   for (let index = 0; index < users.length; index++) {
     let divElementId = document.createElement("div");
     divElementId.innerText = users[index].id.toString();
@@ -250,7 +230,7 @@ async function showUserExpenses(elementId: string){
     divElementCategory.innerText = "Kategorisi";
     userExpenseList.appendChild(divElementCategory);
 
-  let userExpenses = await expenseService.getExpensesByUserId(userService.currentUser.id);
+  let userExpenses = await expenseService.getExpenses(userService.currentUser.id);
   for (let index = 0; index < userExpenses.length; index++) {
     let divElementId = document.createElement("div");
     divElementId.innerText = userExpenses[index].id.toString();
@@ -553,7 +533,7 @@ const handleEditProfileSaveClick = () => {
 editProfileSaveButton.addEventListener("click", handleEditProfileSaveClick);
 
 const handleLogoutClick = async () => {
-  if (await userService.logout()) {
+  if (await userService.logout(userService.currentUser.id)) {
     console.log("Oturum kapatma işlemi başarılı.");
     refreshMenus();
     window.location.replace("#");

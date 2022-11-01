@@ -2,11 +2,7 @@ import { ExpenseCategory } from "../domain/expenseCategory";
 
 export class ExpenseCategoryService {
 
-    // private defaultExpenseCategories: string[] = ["Çocuk", "Güvenlik", "Kitap", "Sağlık"];
-
-
     constructor() {
-        // this.expenseCategoryListDB = expenseCategoryListDB;
     }
 
     public async getExpenseCategoriesByUserId(userId: number): Promise<ExpenseCategory[]> {
@@ -75,7 +71,7 @@ export class ExpenseCategoryService {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    name: name
+                    name
                 })
             });
     
@@ -107,8 +103,8 @@ export class ExpenseCategoryService {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    id: id,
-                    editedName: editedName
+                    id,
+                    editedName
                 })
             });
     
@@ -140,7 +136,7 @@ export class ExpenseCategoryService {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    id: id
+                    id
                 })
             });
     

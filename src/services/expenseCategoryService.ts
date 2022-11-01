@@ -39,9 +39,9 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async getExpenseCategoryByUserIdAndExpenseCategoryId(userId: number, expenseCategoryId: number): Promise<ExpenseCategory> {
+    public async getExpenseCategoryByUserIdAndExpenseCategoryId(userId: number, id: number): Promise<ExpenseCategory> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories/" + expenseCategoryId.toString, {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories/" + id.toString, {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -87,7 +87,7 @@ export class ExpenseCategoryService {
     
             const result = (await response.json());
     
-            console.log(<boolean>JSON.parse(JSON.stringify(result, null, 4)));
+            // console.log("result is: ", JSON.stringify(result, null, 4));
     
             return <boolean>JSON.parse(JSON.stringify(result, null, 4));
     
@@ -104,7 +104,7 @@ export class ExpenseCategoryService {
 
     public async editExpenseCategory(userId: number, id: number, editedName: string): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/categories/", {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories/" + id.toString, {
                 method: "PUT",
                 headers: {
                     Accept: "application/json"

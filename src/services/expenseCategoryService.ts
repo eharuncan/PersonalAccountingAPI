@@ -11,7 +11,7 @@ export class ExpenseCategoryService {
 
     public async getExpenseCategoriesByUserId(userId: number): Promise<ExpenseCategory[]> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/categories/" + userId, {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories", {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -41,15 +41,11 @@ export class ExpenseCategoryService {
 
     public async getExpenseCategoryByUserIdAndExpenseCategoryId(userId: number, expenseCategoryId: number): Promise<ExpenseCategory> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/categories/", {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories/" + expenseCategoryId.toString, {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
-                },
-                // body: JSON.stringify({
-                //     categoryId: categoryId,
-                //     expenseCategoryId: expenseCategoryId
-                // })
+                }
             });
     
             if (!response.ok) {
@@ -73,16 +69,15 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async addExpenseCategory(userId: number, expenseCategoryName: string): Promise<boolean> {
+    public async addExpenseCategory(userId: number, name: string): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/categories/", {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    userId: userId,
-                    expenseCategoryName: expenseCategoryName
+                    name: name
                 })
             });
     
@@ -92,7 +87,7 @@ export class ExpenseCategoryService {
     
             const result = (await response.json());
     
-            // console.log("result is: ", JSON.stringify(result, null, 4));
+            console.log("result is: ", JSON.stringify(result, null, 4));
     
             return <boolean>JSON.parse(JSON.stringify(result, null, 4));
     

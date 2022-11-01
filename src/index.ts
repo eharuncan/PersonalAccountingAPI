@@ -118,18 +118,20 @@ refreshMenus();
 
 const handleMainClick = () => {
   window.location.replace("#main-page");
+  return false; // prevent reload
 };
 mainButton.addEventListener("click", handleMainClick);
 
 const handleRegisterClick = () => {
   window.location.replace("#register-page");
+  return false; // prevent reload
 };
 registerButton.addEventListener("click", handleRegisterClick);
 
 const handleRegisterSaveClick = () => {
   const registerForm = document.getElementById("register-form");
   if (registerForm != null) {
-    registerForm.onsubmit = async () => {
+    registerForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>registerForm);
       const name = formData.get("register-name") as string;
       const surname = formData.get("register-surname") as string;
@@ -143,8 +145,7 @@ const handleRegisterSaveClick = () => {
       } else {
         console.log("Hata: Kayıt işlemi başarısız.");
       }
-
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 };
@@ -152,13 +153,14 @@ registerSaveButton.addEventListener("click", handleRegisterSaveClick);
 
 const handleLoginClick = () => {
   window.location.replace("#login-page");
+  return false; // prevent reload
 };
 loginButton.addEventListener("click", handleLoginClick);
 
 const handleLoginSaveClick = () => {
   const loginForm = document.getElementById("login-form");
   if (loginForm != null) {
-    loginForm.onsubmit = async () => {
+    loginForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>loginForm);
       const email = formData.get("login-email") as string;
       const password = formData.get("login-password") as string;
@@ -177,8 +179,7 @@ const handleLoginSaveClick = () => {
       } else {
         console.log("Hata: Oturum açma işlemi başarısız.");
       }
-
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 }
@@ -304,12 +305,14 @@ async function showUserExpenseCategories(elementId: string){
 const handleShowUsersClick = () => {
   window.location.replace("#show-users-page");
   showUsers("#show-users-list");
+  return false; // prevent reload
 };
 showUsersButton.addEventListener("click", handleShowUsersClick);
 
 const handleDeleteUserClick = () => {
   showUsers("#delete-user-list")
   window.location.replace("#delete-user-page");
+  return false; // prevent reload
 }
 deleteUserButton.addEventListener("click", handleDeleteUserClick);
 deleteUserButton2.addEventListener("click", handleDeleteUserClick);
@@ -317,7 +320,7 @@ deleteUserButton2.addEventListener("click", handleDeleteUserClick);
 const handleDeleteUserSaveClick = () => {
   const deleteUserForm = document.getElementById("delete-user-form");
   if (deleteUserForm != null) {
-    deleteUserForm.onsubmit = async () => {
+    deleteUserForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>deleteUserForm);
       const id = formData.get("delete-user-id") as string;
       if (await userService.deleteUser(Number(id))) {
@@ -327,7 +330,7 @@ const handleDeleteUserSaveClick = () => {
       } else {
         console.log("Hata: Kullanıcı silme işlemi başarısız.");
       }
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 }
@@ -336,6 +339,7 @@ deleteUserSaveButton.addEventListener("click", handleDeleteUserSaveClick);
 const handleShowExpensesClick = () => {
   window.location.replace("#show-expenses-page");
   showUserExpenses("#show-expenses-list");
+  return false; // prevent reload
 };
 showExpensesButton.addEventListener("click", handleShowExpensesClick);
 
@@ -344,6 +348,7 @@ const handleAddExpenseClick = () => {
   const addExpenseDate = <HTMLInputElement>document.querySelector("#add-expense-date");
   addExpenseDate.setAttribute("value", (new Date(Date.now())).toString());
   showUserExpenseCategories("#add-expense-show-categories-list");
+  return false; // prevent reload
 };
 addExpenseButton.addEventListener("click", handleAddExpenseClick);
 addExpenseButton2.addEventListener("click", handleAddExpenseClick);
@@ -351,7 +356,7 @@ addExpenseButton2.addEventListener("click", handleAddExpenseClick);
 const handleAddExpenseSaveClick = () => {
   const addExpenseForm = document.getElementById("add-expense-form");
   if (addExpenseForm != null) {
-    addExpenseForm.onsubmit = async () => {
+    addExpenseForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>addExpenseForm);
       const name = formData.get("add-expense-name") as string;
       const amount = formData.get("add-expense-amount") as string;
@@ -364,8 +369,7 @@ const handleAddExpenseSaveClick = () => {
       } else {
         console.log("Hata: Harcama ekleme işlemi başarısız.");
       }
-
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 };
@@ -375,6 +379,7 @@ const handleEditExpenseClick = () => {
   window.location.replace("#edit-expense-page");
   showUserExpenses("#edit-expense-list");
   showUserExpenseCategories("#edit-expense-categories-list");
+  return false; // prevent reload
 }
 editExpenseButton.addEventListener("click", handleEditExpenseClick);
 editExpenseButton2.addEventListener("click", handleEditExpenseClick);
@@ -382,7 +387,7 @@ editExpenseButton2.addEventListener("click", handleEditExpenseClick);
 const handleEditExpenseSaveClick = () => {
   const editExpenseForm = document.getElementById("edit-expense-form");
   if (editExpenseForm != null) {
-    editExpenseForm.onsubmit = async () => {
+    editExpenseForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>editExpenseForm);
       const id = formData.get("edit-expense-id") as string;
       const editedName = formData.get("edit-expense-name") as string;
@@ -396,7 +401,7 @@ const handleEditExpenseSaveClick = () => {
       } else {
         console.log("Hata: Harcama güncelleme işlemi başarısız.");
       }
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 }
@@ -405,6 +410,7 @@ editExpenseSaveButton.addEventListener("click", handleEditExpenseSaveClick);
 const handleDeleteExpenseClick = () => {
   showUserExpenses("#delete-expense-list")
   window.location.replace("#delete-expense-page");
+  return false; // prevent reload
 }
 deleteExpenseButton.addEventListener("click", handleDeleteExpenseClick);
 deleteExpenseButton2.addEventListener("click", handleDeleteExpenseClick);
@@ -412,7 +418,7 @@ deleteExpenseButton2.addEventListener("click", handleDeleteExpenseClick);
 const handleDeleteExpenseSaveClick = () => {
   const deleteExpenseForm = document.getElementById("delete-expense-form");
   if (deleteExpenseForm != null) {
-    deleteExpenseForm.onsubmit = async () => {
+    deleteExpenseForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>deleteExpenseForm);
       const id = formData.get("delete-expense-id") as string;
       if (await expenseService.deleteExpense(userService.currentUser.id, Number(id))) {
@@ -422,7 +428,7 @@ const handleDeleteExpenseSaveClick = () => {
       } else {
         console.log("Hata: Harcama silme işlemi başarısız.");
       }
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 }
@@ -431,11 +437,13 @@ deleteExpenseSaveButton.addEventListener("click", handleDeleteExpenseSaveClick);
 const handleShowCategoriesClick = () => {
   window.location.replace("#show-categories-page");
   showUserExpenseCategories("#show-categories-list");
+  return false; // prevent reload
 };
 showCategoriesButton.addEventListener("click", handleShowCategoriesClick);
 
 const handleAddCategoryClick = () => {
   window.location.replace("#add-category-page");
+  return false; // prevent reload
 };
 addCategoryButton.addEventListener("click", handleAddCategoryClick);
 addCategoryButton2.addEventListener("click", handleAddCategoryClick);
@@ -443,7 +451,7 @@ addCategoryButton2.addEventListener("click", handleAddCategoryClick);
 const handleAddCategorySaveClick = () => {
   const addCategoryForm = document.getElementById("add-category-form");
   if (addCategoryForm != null) {
-    addCategoryForm.onsubmit = async () => {
+    addCategoryForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>addCategoryForm);
       const name = formData.get("add-category-name") as string;
       if (await expenseCategoryService.addExpenseCategory(userService.currentUser.id, name)) {
@@ -452,8 +460,7 @@ const handleAddCategorySaveClick = () => {
       } else {
         console.log("Hata: Kategori ekleme işlemi başarısız.");
       }
-
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 };
@@ -462,6 +469,7 @@ addCategorySaveButton.addEventListener("click", handleAddCategorySaveClick);
 const handleEditCategoryClick = () => {
   showUserExpenseCategories("#edit-category-list")
   window.location.replace("#edit-category-page");
+  return false; // prevent reload
 }
 editCategoryButton.addEventListener("click", handleEditCategoryClick);
 editCategoryButton2.addEventListener("click", handleEditCategoryClick);
@@ -469,7 +477,7 @@ editCategoryButton2.addEventListener("click", handleEditCategoryClick);
 const handleEditCategorySaveClick = () => {
   const editCategoryForm = document.getElementById("edit-category-form");
   if (editCategoryForm != null) {
-    editCategoryForm.onsubmit = async () => {
+    editCategoryForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>editCategoryForm);
       const id = formData.get("edit-category-id") as string;
       const editedName = formData.get("edit-category-name") as string;
@@ -480,7 +488,7 @@ const handleEditCategorySaveClick = () => {
       } else {
         console.log("Hata: Kategori güncelleme işlemi başarısız.");
       }
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 }
@@ -489,6 +497,7 @@ editCategorySaveButton.addEventListener("click", handleEditCategorySaveClick);
 const handleDeleteCategoryClick = () => {
   showUserExpenseCategories("#delete-category-list")
   window.location.replace("#delete-category-page");
+  return false; // prevent reload
 }
 deleteCategoryButton.addEventListener("click", handleDeleteCategoryClick);
 deleteCategoryButton2.addEventListener("click", handleDeleteCategoryClick);
@@ -496,7 +505,7 @@ deleteCategoryButton2.addEventListener("click", handleDeleteCategoryClick);
 const handleDeleteCategorySaveClick = () => {
   const deleteCategoryForm = document.getElementById("delete-category-form");
   if (deleteCategoryForm != null) {
-    deleteCategoryForm.onsubmit = async () => {
+    deleteCategoryForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>deleteCategoryForm);
       const id = formData.get("delete-category-id") as string;
       if (await expenseCategoryService.deleteExpenseCategory(userService.currentUser.id, Number(id))) {
@@ -506,7 +515,7 @@ const handleDeleteCategorySaveClick = () => {
       } else {
         console.log("Hata: Kategori silme işlemi başarısız.");
       }
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 }
@@ -519,6 +528,7 @@ const handleShowProfileClick = () => {
   showProfileName.innerText = userService.currentUser.name;
   showProfileSurname.innerText = userService.currentUser.surname;
   showProfileEmail.innerText = userService.currentUser.email;
+  return false; // prevent reload
 }
 showProfileButton.addEventListener("click", handleShowProfileClick);
 
@@ -530,6 +540,7 @@ const handleEditProfileClick = () => {
   editProfileName.setAttribute("value", userService.currentUser.name);
   editProfileSurname.setAttribute("value", userService.currentUser.surname);
   editProfileEmail.setAttribute("value", userService.currentUser.email);
+  return false; // prevent reload
 }
 editProfileButton.addEventListener("click", handleEditProfileClick);
 editProfileButton2.addEventListener("click", handleEditProfileClick);
@@ -537,7 +548,7 @@ editProfileButton2.addEventListener("click", handleEditProfileClick);
 const handleEditProfileSaveClick = () => {
   const editProfileForm = document.getElementById("edit-profile-form");
   if (editProfileForm != null) {
-    editProfileForm.onsubmit = async () => {
+    editProfileForm.onsubmit = async (e) => {
       const formData = new FormData(<HTMLFormElement>editProfileForm);
       const editedName = formData.get("edit-profile-name") as string;
       const editedSurname = formData.get("edit-profile-surname") as string;
@@ -551,7 +562,7 @@ const handleEditProfileSaveClick = () => {
       } else {
         console.log("Hata: Kullanıcı güncelleme işlemi başarısız.");
       }
-      return false; // prevent reload
+      e.preventDefault();
     };
   }
 }
@@ -565,5 +576,6 @@ const handleLogoutClick = async () => {
   } else {
     console.log("Hata: Oturum kapatma işlemi başarısız.");
   }
+  return false; // prevent reload
 }
 logoutButton.addEventListener("click", handleLogoutClick);

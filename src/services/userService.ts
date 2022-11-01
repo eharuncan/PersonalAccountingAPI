@@ -4,124 +4,243 @@ import { UserTypes } from "../enums/userTypes";
 import { expenseCategoryService } from "../index";
 
 export class UserService {
-    private userListDB: Array<User>;
     private _currentUser: User;
 
-    constructor(userListDB: Array<User>) {
-        this.userListDB = userListDB;
-
-        this.register("admin", "admin", "admin", "admin", "admin");
-        this.register("customer1", "customer1", "1", "1", "1");
-
+    constructor() {
         this._currentUser = null as any;
     }
 
-    public getUsers(): Array<User> {
-        return this.userListDB;
-    }
+    public async getUsers(): Promise<User[]> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/", {
+                method: "GET",
+                headers: {
+                    Accept: "application/json"
+                }
+            });
 
-    public getUserById(userId: number): User {
-        let resultList = this.userListDB.filter((user) => user.id == userId);
-        return resultList[0];
-    }
-
-    public getUserByEmailAndPassword(email: string, password: string): User {
-        let resultList = this.userListDB.filter((user) => user.email == email && user.password == password );
-        return resultList[0];
-    }
-
-    public register(name: string, surname: string, email: string, password: string, retypedPassword: string): boolean {
-
-        if(!this.checkPasswords(password, retypedPassword)){
-            console.log("Hata: Şifreler uyuşmuyor.");
-            return false;
-        }
-        let newUserId;
-        let userList = this.userListDB;
-        if (userList.length == 0) {
-            newUserId = 0;
-        } else {
-            let lastUser = userList[userList.length - 1];
-            newUserId = lastUser.id + 1;
-        }
-
-        // if (!expenseCategoryService.addDefaultExpenseCategories(newUserId)) {
-        //     return false;
-        // }
-
-        let selectedUserType;
-        if (name == "admin") {
-            selectedUserType = UserTypes.ADMIN;
-        } else {
-            selectedUserType = UserTypes.CUSTOMER;
-        }
-
-        let newUser = new User(newUserId, selectedUserType, name, surname, email, password)
-        this.userListDB.push(newUser);
-        this.currentUser = newUser;
-        console.log(this.currentUser);
-        return true;
-
-    }
-
-    public editUser(id: number, editedName: string, editedSurname: string, editedEmail: string, editedPassword: string, retypedPassword: string): boolean {
-        if(this.checkPasswords(editedPassword,retypedPassword)){
-            console.log("buraya girdi");
-            let editedUser = new User(id, UserTypes.CUSTOMER, editedName, editedSurname, editedEmail, editedPassword)
-            let index = this.getUsers().indexOf(this.getUserById(id));
-            this.userListDB[index] = editedUser;
-            this.currentUser = editedUser;
-            return true;
-        }else{
-            return false;
-        }
-    }
-
-    public deleteUser(userId: number): boolean {
-        if (userId == 0) {
-            return false;
-        } else {
-            let foundUser = this.getUserById(userId);
-            let index = this.userListDB.indexOf(foundUser, 0);
-            if (index > -1) {
-                this.userListDB.splice(index, 1);
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
             }
-            return true;
+
+            const result = (await response.json());
+
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+
+            return <User[]>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return null as any;
         }
     }
 
-    public login(email: string, password: string): boolean {
-        if (this.checkUser(email, password)) {
-            this.currentUser = this.getUserByEmailAndPassword(email, password);
-            console.log(this.currentUser);
-            return true;
-        } else {
+    public async getUserById(userId: number): Promise<User> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString(), {
+                method: "GET",
+                headers: {
+                    Accept: "application/json"
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+
+            return <User>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return null as any;
+        }
+    }
+
+    public async register(name: string, surname: string, email: string, password: string, retypedPassword: string): Promise<boolean> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/register", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    surname,
+                    email,
+                    password,
+                    retypedPassword
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+
+            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
             return false;
         }
     }
 
-    public logout(): boolean {
-        // Burada user adına tutulan oturum açma bilgileri silinir.
-        this.currentUser = null as any;
-        return true;
-    }
+    public async editUser(id: number, editedName: string, editedSurname: string, editedEmail: string, editedPassword: string, retypedPassword: string): Promise<boolean> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + id.toString(), {
+                method: "PUT",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    id,
+                    editedName,
+                    editedSurname,
+                    editedEmail,
+                    editedPassword,
+                    retypedPassword
+                })
+            });
 
-    public checkPasswords(password1: string, password2: string): boolean {
-        if (password1 == password2) {
-            return true;
-        } else {
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+
+            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
             return false;
         }
     }
 
-    public checkUser(email: string, password: string): boolean {
-        let resultList = this.userListDB.filter((user) => user.email == email && user.password == password );
-        if (resultList.length == 0) {
-            console.log("Hata: Sistemde kayıtlı böyle bir kullanıcı yok.")
+    public async deleteUser(id: number): Promise<boolean> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + id.toString(), {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+
+            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
             return false;
-        } else {
-            return true;
-        }     
+        }
+    }
+
+
+    public async login(email: string, password: string): Promise<User> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/login/" + email, {
+                method: "POST",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+
+            this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
+
+            console.log("result is: ", JSON.stringify(result, null, 4));
+
+            return <User>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return null as any;
+        }
+    }
+
+    public async logout(id: number): Promise<boolean> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/logout", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    id
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+
+            this.currentUser = null as any;
+
+            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return false;
+        }
     }
 
     get currentUser(): User {

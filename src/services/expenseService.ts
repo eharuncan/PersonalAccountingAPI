@@ -1,119 +1,141 @@
 import { Expense } from "../domain/expense";
 
-import moment from 'moment';
-
 export class ExpenseService {
-    private expenseListDB: Array<Expense>;
 
-    constructor(expenseListDB: Array<Expense>) {
-        this.expenseListDB = expenseListDB;
+    constructor() {
     }
 
-    public getExpenses(): Array<Expense> {
-        return this.expenseListDB;
-    }
-
-    public getExpensesByUserId(userId: number): Array<Expense> {
-        let resultList = this.expenseListDB.filter((expense) => expense.userId === userId);
-        return resultList;
-    }
-
-    public getExpenseByUserIdAndExpenseId(userId: number, expenseId: number): Expense {
-        let resultList = this.expenseListDB.filter((expense) => expense.userId === userId && expense.id === expenseId);
-        return resultList[0];
-    }
-
-    public addExpense(userId: number, name: string, amount: bigint, date: Date, categoryId: number ): boolean {
-            let newExpenseId;
-            let expenseList = this.expenseListDB;
-            if (expenseList.length == 0) {
-                newExpenseId = 1;
-            } else {
-                let lastExpense = expenseList[expenseList.length - 1];
-                newExpenseId = lastExpense.id + 1;
+    public async getExpenses(userId: number): Promise<Expense[]> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses", {
+                method: "GET",
+                headers: {
+                    Accept: "application/json"
+                }
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
             }
-            let newExpense = new Expense(userId, newExpenseId, name, amount, date, categoryId);
-            console.log("newExpense", newExpense);
-            this.expenseListDB.push(newExpense);
-            return true;
-    }
-
-    public editExpense(userId: number, id: number, editedName: string, editedAmount: bigint, editedDate: Date, editedCategoryId: number): boolean {
-        let expense = this.getExpenseByUserIdAndExpenseId(userId, id);
-        let index = this.getExpenses().indexOf(expense);
-        let editedExpense = new Expense(userId, id, editedName, editedAmount, editedDate, editedCategoryId);
-        this.expenseListDB[index] = editedExpense;
-        console.log("editedExpense", editedExpense);
-        return true;
-    }
-
-    public deleteExpense(userId: number, expenseId: number): boolean {
-        let foundExpense = this.getExpenseByUserIdAndExpenseId(userId, expenseId);
-        let index = this.expenseListDB.indexOf(foundExpense, 0);
-        if (index > -1) {
-            this.expenseListDB.splice(index, 1);
+    
+            const result = (await response.json());
+    
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+    
+            return <Expense[]>JSON.parse(JSON.stringify(result, null, 4));
+    
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return null as any;
         }
-        return true;
     }
 
-    public getSumOfUserExpensesOfDay(userId: number, date: Date): bigint {
-        let today = moment().toDate();
-        let year = moment(today).year();
-        let month = moment(today).month();
-        let day = moment(today).day();
-
-        let currentUsersExpenseList = this.getExpensesByUserId(userId);
-
-        let resultList = currentUsersExpenseList.filter(
-                (expense) =>
-                    moment(expense.date).year() == year &&
-                    moment(expense.date).month() == month &&
-                    moment(expense.date).day() == day
-            );
-
-        let sum = BigInt(0);
-        resultList.forEach((expense) => {
-            sum += expense.amount;
-        });
-        return sum;
+    public async addExpense(userId: number, name: string, amount: bigint, date: Date, categoryId: number): Promise<boolean> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses", {
+                method: "POST",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    name,
+                    amount: amount.toString(),
+                    date: date.toString(),
+                    categoryId
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+    
+            const result = (await response.json());
+    
+            console.log("result is: ", JSON.stringify(result, null, 4));
+    
+            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+    
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return false;
+        }
     }
 
-    public getSumOfUserExpensesOfMonth(userId: number, date: Date): bigint {
-        let today = moment().toDate();
-        let year = moment(today).year();
-        let month = moment(today).month();
-
-        let currentUsersExpenseList = this.getExpensesByUserId(userId);
-
-        let resultList = currentUsersExpenseList.filter(
-                (expense) =>
-                moment(expense.date).year() == year &&
-                moment(expense.date).month() == month
-        );
-
-        let sum = BigInt(0);
-        resultList.forEach((expense) => {
-            sum += expense.amount;
-        });
-        return sum;
+    public async editExpense(userId: number, id: number, editedName: string, editedAmount: bigint, editedDate: Date, editedCategoryId: number): Promise<boolean> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses/" + id.toString, {
+                method: "PUT",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    userId,
+                    id,
+                    editedName,
+                    editedAmount: editedAmount.toString(),
+                    editedDate: editedDate.toString(),
+                    editedCategoryId
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+    
+            const result = (await response.json());
+    
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+    
+            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+    
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return false;
+        }
     }
 
-    public getSumOfUserExpensesOfYear(userId: number, date: Date): bigint {
-        let today = moment().toDate();
-        let year = moment(today).year();
-
-        let currentUsersExpenseList = this.getExpensesByUserId(userId);
-
-        let resultList = currentUsersExpenseList.filter(
-                (expense) =>
-                moment(expense.date).year() == year
-        );
-
-        let sum = BigInt(0);
-        resultList.forEach((expense) => {
-            sum += expense.amount;
-        });
-        return sum;
+    public async deleteExpense(userId: number, id: number): Promise<boolean> {
+        try {
+            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses/" + id.toString, {
+                method: "DELETE",
+                headers: {
+                    Accept: "application/json"
+                },
+                body: JSON.stringify({
+                    id
+                })
+            });
+    
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+    
+            const result = (await response.json());
+    
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+    
+            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+    
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return false;
+        }
     }
+
 }
-

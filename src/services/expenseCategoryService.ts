@@ -87,7 +87,7 @@ export class ExpenseCategoryService {
     
             const result = (await response.json());
     
-            console.log("result is: ", JSON.stringify(result, null, 4));
+            console.log(<boolean>JSON.parse(JSON.stringify(result, null, 4)));
     
             return <boolean>JSON.parse(JSON.stringify(result, null, 4));
     

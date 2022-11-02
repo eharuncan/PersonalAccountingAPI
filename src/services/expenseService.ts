@@ -1,4 +1,5 @@
 import { Expense } from "../domain/expense";
+import { apiURL } from "../utils/utils";
 
 export class ExpenseService {
 
@@ -7,7 +8,7 @@ export class ExpenseService {
 
     public async getExpenses(userId: number): Promise<Expense[]> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses", {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses", {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -36,7 +37,7 @@ export class ExpenseService {
 
     public async addExpense(userId: number, name: string, amount: bigint, date: Date, categoryId: number): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses", {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
@@ -55,7 +56,7 @@ export class ExpenseService {
     
             const result = (await response.json());
     
-            console.log("result is: ", JSON.stringify(result, null, 4));
+            // console.log("result is: ", JSON.stringify(result, null, 4));
     
             return <boolean>JSON.parse(JSON.stringify(result, null, 4));
     
@@ -71,7 +72,7 @@ export class ExpenseService {
 
     public async editExpense(userId: number, id: number, editedName: string, editedAmount: bigint, editedDate: Date, editedCategoryId: number): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses/" + id.toString, {
                 method: "PUT",
                 headers: {
                     Accept: "application/json"
@@ -108,7 +109,7 @@ export class ExpenseService {
 
     public async deleteExpense(userId: number, id: number): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses/" + id.toString, {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json"

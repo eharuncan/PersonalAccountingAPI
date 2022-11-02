@@ -1,6 +1,7 @@
 import { ExpenseCategoryService } from "./services/expenseCategoryService";
 import { UserService } from "./services/userService";
 import { ExpenseService } from "./services/expenseService";
+import { UserTypes } from "./enums/userTypes";
 
 export let expenseCategoryService: ExpenseCategoryService;
 export let userService: UserService;
@@ -56,6 +57,12 @@ const editProfileSaveButton = <HTMLButtonElement>document.querySelector("#edit-p
 
 const logoutButton = <HTMLButtonElement>document.querySelector("#logout-button");
 
+function removeAllChildNodes(parent: HTMLDivElement) {
+  while (parent.firstChild) {
+      parent.removeChild(parent.firstChild);
+  }
+}
+
 function refreshMenus() {
   const mainMenu = <HTMLDivElement>document.querySelector("#main-menu");
   const usersMenu = <HTMLDivElement>document.querySelector("#users-menu");
@@ -65,7 +72,7 @@ function refreshMenus() {
   const loginMenu = <HTMLDivElement>document.querySelector("#login-menu");
   const profileMenu = <HTMLDivElement>document.querySelector("#profile-menu");
   const logoutMenu = <HTMLDivElement>document.querySelector("#logout-menu");
-  if (userService.currentUser == null) {
+  if (userService.currentUser === null) {
     mainMenu.setAttribute("style", "display: block;");
     loginMenu.setAttribute("style", "display: block;");
     registerMenu.setAttribute("style", "display: block;");
@@ -76,7 +83,7 @@ function refreshMenus() {
     profileMenu.setAttribute("style", "display: none;");
     logoutMenu.setAttribute("style", "display: none;");
   } else {
-    if(userService.currentUser.type == "ADMIN"){
+    if(userService.currentUser.type === UserTypes.ADMIN){
       usersMenu.setAttribute("style", "display: block;");
     }else{
       expensesMenu.setAttribute("style", "display: block;");
@@ -89,80 +96,6 @@ function refreshMenus() {
     logoutMenu.setAttribute("style", "display: block;");
     logoutButton.innerText = "Oturumu Kapat (" + userService.currentUser.name + ")"
     profileMenu.setAttribute("style", "display: block;");
-  }
-}
-
-refreshMenus();
-
-const handleMainClick = () => {
-  window.location.replace("#main-page");
-};
-mainButton.addEventListener("click", handleMainClick);
-
-const handleRegisterClick = () => {
-  window.location.replace("#register-page");
-};
-registerButton.addEventListener("click", handleRegisterClick);
-
-const handleRegisterSaveClick = () => {
-  const registerForm = document.getElementById("register-form");
-  if (registerForm != null) {
-    registerForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const formData = new FormData(<HTMLFormElement>registerForm);
-      const name = formData.get("register-name") as string;
-      const surname = formData.get("register-surname") as string;
-      const email = formData.get("register-email") as string;
-      const password = formData.get("register-password") as string;
-      const retypedPassword = formData.get("register-retyped-password") as string;
-      if (await userService.register(name, surname, email, password, retypedPassword)) {
-        console.log("Kayıt işlemi başarılı.");
-        refreshMenus();
-        window.location.replace("#show-expenses-page");
-      } else {
-        console.log("Hata: Kayıt işlemi başarısız.");
-      }
-    };
-  }
-};
-registerSaveButton.addEventListener("click", handleRegisterSaveClick);
-
-const handleLoginClick = () => {
-  window.location.replace("#login-page");
-};
-loginButton.addEventListener("click", handleLoginClick);
-
-const handleLoginSaveClick = () => {
-  const loginForm = document.getElementById("login-form");
-  if (loginForm != null) {
-    loginForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const formData = new FormData(<HTMLFormElement>loginForm);
-      const email = formData.get("login-email") as string;
-      const password = formData.get("login-password") as string;
-
-      if (await userService.login(email, password) != null) {
-        console.log("Oturum açma işlemi başarılı.");
-        refreshMenus();
-        if(userService.currentUser.type == "CUSTOMER"){
-          window.location.replace("#show-expenses-page");
-          handleShowExpensesClick();
-        }else if (userService.currentUser.type == "ADMIN"){
-          window.location.replace("#show-users-page");
-          handleShowUsersClick();
-        }
-        
-      } else {
-        console.log("Hata: Oturum açma işlemi başarısız.");
-      }
-    };
-  }
-}
-loginSaveButton.addEventListener("click", handleLoginSaveClick);
-
-function removeAllChildNodes(parent: HTMLDivElement) {
-  while (parent.firstChild) {
-      parent.removeChild(parent.firstChild);
   }
 }
 
@@ -187,7 +120,6 @@ async function showUsers(elementId: string){
     userList.appendChild(divElementEmail);
 
   let users = await userService.getUsers();
-  console.log(users);
   for (let index = 0; index < users.length; index++) {
     let divElementId = document.createElement("div");
     divElementId.innerText = users[index].id.toString();
@@ -277,6 +209,75 @@ async function showUserExpenseCategories(elementId: string){
     userCategoryList.appendChild(divElementName);
   }
 }
+
+refreshMenus();
+
+const handleMainClick = () => {
+  window.location.replace("#main-page");
+};
+mainButton.addEventListener("click", handleMainClick);
+
+const handleRegisterClick = () => {
+  window.location.replace("#register-page");
+};
+registerButton.addEventListener("click", handleRegisterClick);
+
+const handleRegisterSaveClick = () => {
+  const registerForm = document.getElementById("register-form");
+  if (registerForm != null) {
+    registerForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(<HTMLFormElement>registerForm);
+      const name = formData.get("register-name") as string;
+      const surname = formData.get("register-surname") as string;
+      const email = formData.get("register-email") as string;
+      const password = formData.get("register-password") as string;
+      const retypedPassword = formData.get("register-retyped-password") as string;
+      if (await userService.register(name, surname, email, password, retypedPassword) != null) {
+        console.log("Kayıt işlemi başarılı.");
+        refreshMenus();
+        window.location.replace("#show-expenses-page");
+        handleShowExpensesClick();
+      } else {
+        console.log("Hata: Kayıt işlemi başarısız.");
+      }
+    };
+  }
+};
+registerSaveButton.addEventListener("click", handleRegisterSaveClick);
+
+const handleLoginClick = () => {
+  window.location.replace("#login-page");
+};
+loginButton.addEventListener("click", handleLoginClick);
+
+const handleLoginSaveClick = () => {
+  const loginForm = document.getElementById("login-form");
+  if (loginForm != null) {
+    loginForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(<HTMLFormElement>loginForm);
+      const email = formData.get("login-email") as string;
+      const password = formData.get("login-password") as string;
+
+      if (await userService.login(email, password) != null) {
+        console.log("Oturum açma işlemi başarılı.");
+        refreshMenus();
+        if(userService.currentUser.type === UserTypes.CUSTOMER){
+          window.location.replace("#show-expenses-page");
+          handleShowExpensesClick();
+        }else if (userService.currentUser.type === UserTypes.ADMIN){
+          window.location.replace("#show-users-page");
+          handleShowUsersClick();
+        }
+        
+      } else {
+        console.log("Hata: Oturum açma işlemi başarısız.");
+      }
+    };
+  }
+}
+loginSaveButton.addEventListener("click", handleLoginSaveClick);
 
 const handleShowUsersClick = () => {
   window.location.replace("#show-users-page");

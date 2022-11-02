@@ -1,7 +1,5 @@
 import { User } from "../domain/user";
-import { UserTypes } from "../enums/userTypes";
-
-import { expenseCategoryService } from "../index";
+import { apiURL } from "../utils/utils";
 
 export class UserService {
     private _currentUser: User;
@@ -12,7 +10,7 @@ export class UserService {
 
     public async getUsers(): Promise<User[]> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/", {
+            const response = await window.fetch(apiURL + "/users/", {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -41,7 +39,7 @@ export class UserService {
 
     public async getUserById(userId: number): Promise<User> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString(), {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString(), {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -68,9 +66,9 @@ export class UserService {
         }
     }
 
-    public async register(name: string, surname: string, email: string, password: string, retypedPassword: string): Promise<boolean> {
+    public async register(name: string, surname: string, email: string, password: string, retypedPassword: string): Promise<User> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/register", {
+            const response = await window.fetch(apiURL + "/register", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
@@ -92,7 +90,9 @@ export class UserService {
 
             // console.log("result is: ", JSON.stringify(result, null, 4));
 
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+            this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
+
+            return <User>JSON.parse(JSON.stringify(result, null, 4));
 
         } catch (error) {
             if (error instanceof Error) {
@@ -100,13 +100,13 @@ export class UserService {
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
+            return null as any;
         }
     }
 
     public async editUser(id: number, editedName: string, editedSurname: string, editedEmail: string, editedPassword: string, retypedPassword: string): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + id.toString(), {
+            const response = await window.fetch(apiURL + "/users/" + id.toString(), {
                 method: "PUT",
                 headers: {
                     Accept: "application/json"
@@ -143,7 +143,7 @@ export class UserService {
 
     public async deleteUser(id: number): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + id.toString(), {
+            const response = await window.fetch(apiURL + "/users/" + id.toString(), {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json"
@@ -173,10 +173,9 @@ export class UserService {
         }
     }
 
-
     public async login(email: string, password: string): Promise<User> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/login/" + email, {
+            const response = await window.fetch(apiURL + "/login/" + email, {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
@@ -195,7 +194,7 @@ export class UserService {
 
             this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
 
-            console.log("result is: ", JSON.stringify(result, null, 4));
+            // console.log("result is: ", JSON.stringify(result, null, 4));
 
             return <User>JSON.parse(JSON.stringify(result, null, 4));
 
@@ -211,7 +210,7 @@ export class UserService {
 
     public async logout(id: number): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/logout", {
+            const response = await window.fetch(apiURL + "/logout", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"

@@ -1,4 +1,5 @@
 import { ExpenseCategory } from "../domain/expenseCategory";
+import { apiURL } from "../utils/utils";
 
 export class ExpenseCategoryService {
 
@@ -7,7 +8,7 @@ export class ExpenseCategoryService {
 
     public async getExpenseCategoriesByUserId(userId: number): Promise<ExpenseCategory[]> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories", {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories", {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -36,7 +37,7 @@ export class ExpenseCategoryService {
 
     public async getExpenseCategoryByUserIdAndExpenseCategoryId(userId: number, id: number): Promise<ExpenseCategory> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString, {
                 method: "GET",
                 headers: {
                     Accept: "application/json"
@@ -65,7 +66,7 @@ export class ExpenseCategoryService {
 
     public async addExpenseCategory(userId: number, name: string): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories", {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
@@ -81,7 +82,7 @@ export class ExpenseCategoryService {
     
             const result = (await response.json());
     
-            console.log("result is: ", JSON.stringify(result, null, 4));
+            // console.log("result is: ", JSON.stringify(result, null, 4));
     
             return <boolean>JSON.parse(JSON.stringify(result, null, 4));
     
@@ -97,7 +98,7 @@ export class ExpenseCategoryService {
 
     public async editExpenseCategory(userId: number, id: number, editedName: string): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString, {
                 method: "PUT",
                 headers: {
                     Accept: "application/json"
@@ -130,7 +131,7 @@ export class ExpenseCategoryService {
 
     public async deleteExpenseCategory(userId: number, id: number): Promise<boolean> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/categories/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString, {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json"

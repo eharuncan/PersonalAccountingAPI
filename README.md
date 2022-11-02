@@ -36,3 +36,8 @@ Open: http://localhost:5500/public/ (if you are using visual studio code as your
 <span style="font-size: 1.3rem"> 
 If all the steps are done correctly the counter-example  show be rendered  in your browser when you open index.html in your browser with liveserver
 </span> <br/>
+
+## Using Mock Server for API respons (optional)
+
+You can use Mockoon (https://mockoon.com/) mock server and this backup file to import api:
+https://github.com/eharuncan/ExamplePersonalAccountingWebClient/blob/main/mockoon%20backup.json

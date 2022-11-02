@@ -40,4 +40,4 @@ If all the steps are done correctly the counter-example  show be rendered  in yo
 ## Using Mock Server for API respons (optional)
 
 You can use Mockoon (https://mockoon.com/) mock server and this backup file to import api:
-https://github.com/eharuncan/ExamplePersonalAccountingWebClient/blob/main/mockoon%20backup.json
+https://github.com/eharuncan/ExamplePersonalAccountingWebClient/blob/main/mockoon-backup.json

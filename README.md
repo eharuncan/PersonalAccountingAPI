@@ -1,5 +1,7 @@
 # PersonalAccountingWebClient
 
+which uses HTML, CSS and TypeScript
+
 ## Installing the dependencies
 
 In the projects root directory

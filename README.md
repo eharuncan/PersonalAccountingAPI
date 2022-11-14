@@ -1,4 +1,4 @@
-# PersonalAccountingWebClient
+# ExamplePersonalAccountingWebClient
 
 which uses HTML, CSS and TypeScript
 

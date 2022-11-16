@@ -6,7 +6,7 @@ export class ExpenseCategoryService {
     constructor() {
     }
 
-    public async getExpenseCategoriesByUserId(userId: number): Promise<ExpenseCategory[]> {
+    public async getExpenseCategoriesByUserId(userId: bigint): Promise<ExpenseCategory[]> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories", {
                 method: "GET",
@@ -35,7 +35,7 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async getExpenseCategoryByUserIdAndExpenseCategoryId(userId: number, id: number): Promise<ExpenseCategory> {
+    public async getExpenseCategoryByUserIdAndExpenseCategoryId(userId: bigint, id: bigint): Promise<ExpenseCategory> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString, {
                 method: "GET",
@@ -64,15 +64,15 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async addExpenseCategory(userId: number, name: string): Promise<boolean> {
+    public async addExpenseCategory(newExpenseCategory: ExpenseCategory): Promise<ExpenseCategory> {
         try {
-            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories", {
+            const response = await window.fetch(apiURL + "/users/" + newExpenseCategory.userId.toString() + "/categories", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    name
+                    newExpenseCategory
                 })
             });
     
@@ -84,7 +84,7 @@ export class ExpenseCategoryService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+            return <ExpenseCategory>JSON.parse(JSON.stringify(result, null, 4));
     
         } catch (error) {
             if (error instanceof Error) {
@@ -92,20 +92,19 @@ export class ExpenseCategoryService {
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
+            return null as any;
         }
     }
 
-    public async editExpenseCategory(userId: number, id: number, editedName: string): Promise<boolean> {
+    public async editExpenseCategory(newExpenseCategory: ExpenseCategory): Promise<ExpenseCategory> {
         try {
-            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + newExpenseCategory.userId.toString() + "/categories/" + newExpenseCategory.id.toString, {
                 method: "PUT",
                 headers: {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    id,
-                    editedName
+                    newExpenseCategory
                 })
             });
     
@@ -117,7 +116,7 @@ export class ExpenseCategoryService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+            return <ExpenseCategory>JSON.parse(JSON.stringify(result, null, 4));
     
         } catch (error) {
             if (error instanceof Error) {
@@ -125,20 +124,17 @@ export class ExpenseCategoryService {
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
+            return null as any;
         }
     }
 
-    public async deleteExpenseCategory(userId: number, id: number): Promise<boolean> {
+    public async deleteExpenseCategory(userId: bigint, id: bigint): Promise<void> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString, {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json"
-                },
-                body: JSON.stringify({
-                    id
-                })
+                }
             });
     
             if (!response.ok) {
@@ -148,16 +144,13 @@ export class ExpenseCategoryService {
             const result = (await response.json());
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
-    
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
-    
+        
         } catch (error) {
             if (error instanceof Error) {
                 console.log('error message: ', error.message);
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
         }
     }
 

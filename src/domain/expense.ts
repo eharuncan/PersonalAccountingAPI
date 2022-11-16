@@ -1,15 +1,14 @@
 export class Expense {
 
-    private _userId: number;
-    private _id: number;
+    private _userId: bigint;
+    private _id: bigint;
     private _name: string;
     private _amount: bigint;
     private _date: Date;
-    private _categoryId: number;
+    private _categoryId: bigint;
 
-    constructor(userId: number, id: number, name: string, amount: bigint, date: Date, categoryId: number) {
+    constructor(userId: bigint, name: string, amount: bigint, date: Date, categoryId: bigint) {
         this._userId = userId;
-        this._id = id;
         this._name = name;
         this._amount = amount;
         this._date = date;
@@ -18,17 +17,17 @@ export class Expense {
 
     //Getters, Setters, Attributes
 
-    get userId(): number {
+    get userId(): bigint {
         return this._userId;
     }
-    set userId(userId: number) {
+    set userId(userId: bigint) {
         this._userId = userId;
     }
 
-    get id():number {
+    get id():bigint {
         return this._id;
     }
-    set id(id: number) {
+    set id(id: bigint) {
         this._id = id;
     }
 
@@ -53,10 +52,10 @@ export class Expense {
         this._date = date;
     }
 
-    get categoryId():number {
+    get categoryId():bigint {
         return this._categoryId;
     }
-    set categoryId(categoryId: number) {
+    set categoryId(categoryId: bigint) {
         this._categoryId = categoryId;
     }
 

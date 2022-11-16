@@ -37,7 +37,7 @@ export class UserService {
         }
     }
 
-    public async getUserById(userId: number): Promise<User> {
+    public async getUserById(userId: bigint): Promise<User> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString(), {
                 method: "GET",
@@ -66,7 +66,7 @@ export class UserService {
         }
     }
 
-    public async register(name: string, surname: string, email: string, password: string, retypedPassword: string): Promise<User> {
+    public async register(newUser: User): Promise<User> {
         try {
             const response = await window.fetch(apiURL + "/register", {
                 method: "POST",
@@ -74,11 +74,7 @@ export class UserService {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    name,
-                    surname,
-                    email,
-                    password,
-                    retypedPassword
+                    newUser
                 })
             });
 
@@ -104,20 +100,15 @@ export class UserService {
         }
     }
 
-    public async editUser(id: number, editedName: string, editedSurname: string, editedEmail: string, editedPassword: string, retypedPassword: string): Promise<boolean> {
+    public async editUser(newUser: User): Promise<User> {
         try {
-            const response = await window.fetch(apiURL + "/users/" + id.toString(), {
+            const response = await window.fetch(apiURL + "/users/" + newUser.id.toString(), {
                 method: "PUT",
                 headers: {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    id,
-                    editedName,
-                    editedSurname,
-                    editedEmail,
-                    editedPassword,
-                    retypedPassword
+                    newUser
                 })
             });
 
@@ -129,7 +120,7 @@ export class UserService {
 
             // console.log("result is: ", JSON.stringify(result, null, 4));
 
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+            return <User>JSON.parse(JSON.stringify(result, null, 4));
 
         } catch (error) {
             if (error instanceof Error) {
@@ -137,20 +128,17 @@ export class UserService {
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
+            return null as any;
         }
     }
 
-    public async deleteUser(id: number): Promise<boolean> {
+    public async deleteUser(id: bigint): Promise<void> {
         try {
             const response = await window.fetch(apiURL + "/users/" + id.toString(), {
                 method: "DELETE",
                 headers: {
                     Accept: "application/json"
-                },
-                body: JSON.stringify({
-                    id
-                })
+                }
             });
 
             if (!response.ok) {
@@ -161,28 +149,24 @@ export class UserService {
 
             // console.log("result is: ", JSON.stringify(result, null, 4));
 
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
-
         } catch (error) {
             if (error instanceof Error) {
                 console.log('error message: ', error.message);
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
         }
     }
 
-    public async login(email: string, password: string): Promise<User> {
+    public async login(user: User): Promise<User> {
         try {
-            const response = await window.fetch(apiURL + "/login/" + email, {
+            const response = await window.fetch(apiURL + "/login", {
                 method: "POST",
                 headers: {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    email: email,
-                    password: password
+                    user
                 })
             });
 
@@ -208,7 +192,7 @@ export class UserService {
         }
     }
 
-    public async logout(id: number): Promise<boolean> {
+    public async logout(user: User): Promise<void> {
         try {
             const response = await window.fetch(apiURL + "/logout", {
                 method: "POST",
@@ -216,7 +200,7 @@ export class UserService {
                     Accept: "application/json"
                 },
                 body: JSON.stringify({
-                    id
+                    user
                 })
             });
 
@@ -230,15 +214,12 @@ export class UserService {
 
             this.currentUser = null as any;
 
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
-
         } catch (error) {
             if (error instanceof Error) {
                 console.log('error message: ', error.message);
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
         }
     }
 

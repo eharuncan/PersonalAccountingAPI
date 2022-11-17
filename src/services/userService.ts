@@ -112,7 +112,7 @@ export class UserService {
                 },
                 body: JSON.stringify({
                     'id': newUser.id.toString(),
-                    'type': newUser.type,
+                    'type': newUser.type.toString(),
                     'name': newUser.name,
                     'surname': newUser.surname,
                     'email': newUser.email,

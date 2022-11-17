@@ -2,19 +2,19 @@ import { UserTypes } from "../enums/userTypes";
 
 export class User {
 
-    private _id: number;
+    private _id: bigint;
     private _type: UserTypes;
     private _name: string;
     private _surname: string;
     private _email: string;
     private _password: string;
 
-    constructor(id: number, type: UserTypes, name: string, surname: string, email: string, password: string) {
+    constructor(id: bigint, type: UserTypes, name: string, surname: string, email: string, password: string) {
         this._id = id;
         this._type = type;
         this._name = name;
         this._surname = surname;
-        this._email = email;
+        this.email = email;
         this._password = password;
     }
 
@@ -23,7 +23,7 @@ export class User {
     get id() {
         return this._id;
     }
-    set id(id: number) {
+    set id(id: bigint) {
         this._id = id;
     }
 

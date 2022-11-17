@@ -1,28 +1,28 @@
 export class ExpenseCategory {
 
-    private _userId: number;
-    private _id: number;
+    private _userId: bigint;
+    private _id: bigint;
     private _name: string;
 
-    constructor(userId: number, id: number, name: string) {
-        this._userId = userId;
+    constructor(id: bigint, userId: bigint, name: string) {
         this._id = id;
+        this._userId = userId;
         this._name = name;
     }
 
     //Getters, Setters, Attributes
 
-    get userId():number {
+    get userId():bigint {
         return this._userId;
     }
-    set userId(userId: number) {
+    set userId(userId: bigint) {
         this._userId = userId;
     }
 
-    get id():number {
+    get id():bigint {
         return this._id;
     }
-    set id(id: number) {
+    set id(id: bigint) {
         this._id = id;
     }
 

@@ -2,6 +2,13 @@ import { ExpenseCategoryService } from "./services/expenseCategoryService";
 import { UserService } from "./services/userService";
 import { ExpenseService } from "./services/expenseService";
 
+import { UserTypes } from "./enums/userTypes";
+
+import { User } from "./domain/user";
+import { Expense } from "./domain/expense";
+import { ExpenseCategory } from "./domain/expenseCategory";
+import { dateFormatter, dateFormatter2 } from "./utils/utils";
+
 export let expenseCategoryService: ExpenseCategoryService;
 export let userService: UserService;
 export let expenseService: ExpenseService;
@@ -56,6 +63,12 @@ const editProfileSaveButton = <HTMLButtonElement>document.querySelector("#edit-p
 
 const logoutButton = <HTMLButtonElement>document.querySelector("#logout-button");
 
+function removeAllChildNodes(parent: HTMLDivElement) {
+  while (parent.firstChild) {
+    parent.removeChild(parent.firstChild);
+  }
+}
+
 function refreshMenus() {
   const mainMenu = <HTMLDivElement>document.querySelector("#main-menu");
   const usersMenu = <HTMLDivElement>document.querySelector("#users-menu");
@@ -65,7 +78,7 @@ function refreshMenus() {
   const loginMenu = <HTMLDivElement>document.querySelector("#login-menu");
   const profileMenu = <HTMLDivElement>document.querySelector("#profile-menu");
   const logoutMenu = <HTMLDivElement>document.querySelector("#logout-menu");
-  if (userService.currentUser == null) {
+  if (userService.currentUser === null) {
     mainMenu.setAttribute("style", "display: block;");
     loginMenu.setAttribute("style", "display: block;");
     registerMenu.setAttribute("style", "display: block;");
@@ -76,9 +89,9 @@ function refreshMenus() {
     profileMenu.setAttribute("style", "display: none;");
     logoutMenu.setAttribute("style", "display: none;");
   } else {
-    if(userService.currentUser.type == "ADMIN"){
+    if (userService.currentUser.type === UserTypes.ADMIN) {
       usersMenu.setAttribute("style", "display: block;");
-    }else{
+    } else {
       expensesMenu.setAttribute("style", "display: block;");
       categoriesMenu.setAttribute("style", "display: block;");
     }
@@ -92,102 +105,27 @@ function refreshMenus() {
   }
 }
 
-refreshMenus();
-
-const handleMainClick = () => {
-  window.location.replace("#main-page");
-};
-mainButton.addEventListener("click", handleMainClick);
-
-const handleRegisterClick = () => {
-  window.location.replace("#register-page");
-};
-registerButton.addEventListener("click", handleRegisterClick);
-
-const handleRegisterSaveClick = () => {
-  const registerForm = document.getElementById("register-form");
-  if (registerForm != null) {
-    registerForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const formData = new FormData(<HTMLFormElement>registerForm);
-      const name = formData.get("register-name") as string;
-      const surname = formData.get("register-surname") as string;
-      const email = formData.get("register-email") as string;
-      const password = formData.get("register-password") as string;
-      const retypedPassword = formData.get("register-retyped-password") as string;
-      if (await userService.register(name, surname, email, password, retypedPassword)) {
-        console.log("Kayıt işlemi başarılı.");
-        refreshMenus();
-        window.location.replace("#show-expenses-page");
-      } else {
-        console.log("Hata: Kayıt işlemi başarısız.");
-      }
-    };
-  }
-};
-registerSaveButton.addEventListener("click", handleRegisterSaveClick);
-
-const handleLoginClick = () => {
-  window.location.replace("#login-page");
-};
-loginButton.addEventListener("click", handleLoginClick);
-
-const handleLoginSaveClick = () => {
-  const loginForm = document.getElementById("login-form");
-  if (loginForm != null) {
-    loginForm.onsubmit = async (e) => {
-      e.preventDefault();
-      const formData = new FormData(<HTMLFormElement>loginForm);
-      const email = formData.get("login-email") as string;
-      const password = formData.get("login-password") as string;
-
-      if (await userService.login(email, password) != null) {
-        console.log("Oturum açma işlemi başarılı.");
-        refreshMenus();
-        if(userService.currentUser.type == "CUSTOMER"){
-          window.location.replace("#show-expenses-page");
-          handleShowExpensesClick();
-        }else if (userService.currentUser.type == "ADMIN"){
-          window.location.replace("#show-users-page");
-          handleShowUsersClick();
-        }
-        
-      } else {
-        console.log("Hata: Oturum açma işlemi başarısız.");
-      }
-    };
-  }
-}
-loginSaveButton.addEventListener("click", handleLoginSaveClick);
-
-function removeAllChildNodes(parent: HTMLDivElement) {
-  while (parent.firstChild) {
-      parent.removeChild(parent.firstChild);
-  }
-}
-
-async function showUsers(elementId: string){
+async function showUsers(elementId: string) {
   const userList = <HTMLDivElement>document.querySelector(elementId);
   removeAllChildNodes(userList);
 
-    let divElementId = document.createElement("div");
-    divElementId.innerText = "ID";
-    userList.appendChild(divElementId);
+  let divElementId = document.createElement("div");
+  divElementId.innerText = "ID";
+  userList.appendChild(divElementId);
 
-    let divElementName = document.createElement("div");
-    divElementName.innerText = "Adı";
-    userList.appendChild(divElementName);
+  let divElementName = document.createElement("div");
+  divElementName.innerText = "Adı";
+  userList.appendChild(divElementName);
 
-    let divElementSurname = document.createElement("div");
-    divElementSurname.innerText = "Soyadı";
-    userList.appendChild(divElementSurname);
+  let divElementSurname = document.createElement("div");
+  divElementSurname.innerText = "Soyadı";
+  userList.appendChild(divElementSurname);
 
-    let divElementEmail = document.createElement("div");
-    divElementEmail.innerText = "Eposta adresi";
-    userList.appendChild(divElementEmail);
+  let divElementEmail = document.createElement("div");
+  divElementEmail.innerText = "Eposta adresi";
+  userList.appendChild(divElementEmail);
 
   let users = await userService.getUsers();
-  console.log(users);
   for (let index = 0; index < users.length; index++) {
     let divElementId = document.createElement("div");
     divElementId.innerText = users[index].id.toString();
@@ -207,28 +145,28 @@ async function showUsers(elementId: string){
   }
 }
 
-async function showUserExpenses(elementId: string){
+async function showUserExpenses(elementId: string) {
   const userExpenseList = <HTMLDivElement>document.querySelector(elementId);
   removeAllChildNodes(userExpenseList);
-    let divElementId = document.createElement("div");
-    divElementId.innerText = "Harcama ID";
-    userExpenseList.appendChild(divElementId);
+  let divElementId = document.createElement("div");
+  divElementId.innerText = "Harcama ID";
+  userExpenseList.appendChild(divElementId);
 
-    let divElementName = document.createElement("div");
-    divElementName.innerText = "Adı";
-    userExpenseList.appendChild(divElementName);
+  let divElementName = document.createElement("div");
+  divElementName.innerText = "Adı";
+  userExpenseList.appendChild(divElementName);
 
-    let divElementAmount = document.createElement("div");
-    divElementAmount.innerText = "Miktarı";
-    userExpenseList.appendChild(divElementAmount);
+  let divElementAmount = document.createElement("div");
+  divElementAmount.innerText = "Miktarı";
+  userExpenseList.appendChild(divElementAmount);
 
-    let divElementDate = document.createElement("div");
-    divElementDate.innerText = "Tarihi";
-    userExpenseList.appendChild(divElementDate);
+  let divElementDate = document.createElement("div");
+  divElementDate.innerText = "Tarihi";
+  userExpenseList.appendChild(divElementDate);
 
-    let divElementCategory = document.createElement("div");
-    divElementCategory.innerText = "Kategorisi";
-    userExpenseList.appendChild(divElementCategory);
+  let divElementCategory = document.createElement("div");
+  divElementCategory.innerText = "Kategorisi";
+  userExpenseList.appendChild(divElementCategory);
 
   let userExpenses = await expenseService.getExpenses(userService.currentUser.id);
   for (let index = 0; index < userExpenses.length; index++) {
@@ -245,7 +183,7 @@ async function showUserExpenses(elementId: string){
     userExpenseList.appendChild(divElementAmount);
 
     let divElementDate = document.createElement("div");
-    divElementDate.innerText = userExpenses[index].date.toString();
+    divElementDate.innerText = dateFormatter(userExpenses[index].date).toString();
     userExpenseList.appendChild(divElementDate);
 
     let divElementCategory = document.createElement("div");
@@ -254,18 +192,18 @@ async function showUserExpenses(elementId: string){
   }
 }
 
-async function showUserExpenseCategories(elementId: string){
+async function showUserExpenseCategories(elementId: string) {
   const userCategoryList = <HTMLDivElement>document.querySelector(elementId);
   removeAllChildNodes(userCategoryList);
   let userCategories = await expenseCategoryService.getExpenseCategoriesByUserId(userService.currentUser.id);
 
-    let divElementId = document.createElement("div");
-    divElementId.innerText = "Kategori ID";
-    userCategoryList.appendChild(divElementId);
+  let divElementId = document.createElement("div");
+  divElementId.innerText = "Kategori ID";
+  userCategoryList.appendChild(divElementId);
 
-    let divElementName = document.createElement("div");
-    divElementName.innerText = "Adı";
-    userCategoryList.appendChild(divElementName);
+  let divElementName = document.createElement("div");
+  divElementName.innerText = "Adı";
+  userCategoryList.appendChild(divElementName);
 
   for (let index = 0; index < userCategories.length; index++) {
     let divElementId = document.createElement("div");
@@ -278,10 +216,87 @@ async function showUserExpenseCategories(elementId: string){
   }
 }
 
+function checkPasswords(password1: String, password2: String): Boolean {
+  return (password1 === password2);
+}
+
+refreshMenus();
+
+const handleMainClick = () => {
+  window.location.replace("#main-page");
+}
+mainButton.addEventListener("click", handleMainClick);
+
+const handleRegisterClick = () => {
+  window.location.replace("#register-page");
+}
+registerButton.addEventListener("click", handleRegisterClick);
+
+const handleRegisterSaveClick = () => {
+  const registerForm = document.getElementById("register-form");
+  if (registerForm != null) {
+    registerForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(<HTMLFormElement>registerForm);
+      const name = formData.get("register-name") as string;
+      const surname = formData.get("register-surname") as string;
+      const email = formData.get("register-email") as string;
+      const password = formData.get("register-password") as string;
+      const retypedPassword = formData.get("register-retyped-password") as string;
+      if (checkPasswords(password, retypedPassword)) {
+        let newUser = new User(BigInt(0), UserTypes.CUSTOMER, name, surname, email, password);
+        if (await userService.register(newUser) != null) {
+          console.log("Kayıt işlemi başarılı.");
+          refreshMenus();
+          window.location.replace("#show-expenses-page");
+          handleShowExpensesClick();
+        } else {
+          console.log("Hata: Kayıt işlemi başarısız.");
+        }
+      }
+    };
+  }
+}
+registerSaveButton.addEventListener("click", handleRegisterSaveClick);
+
+const handleLoginClick = () => {
+  window.location.replace("#login-page");
+}
+loginButton.addEventListener("click", handleLoginClick);
+
+const handleLoginSaveClick = () => {
+  const loginForm = document.getElementById("login-form");
+  if (loginForm != null) {
+    loginForm.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(<HTMLFormElement>loginForm);
+      const email = formData.get("login-email") as string;
+      const password = formData.get("login-password") as string;
+      let newUser = new User(BigInt(0), UserTypes.CUSTOMER, "", "", email, password);
+
+      if (await userService.login(newUser) != null) {
+        console.log("Oturum açma işlemi başarılı.");
+        refreshMenus();
+        if (userService.currentUser.type === UserTypes.CUSTOMER) {
+          window.location.replace("#show-expenses-page");
+          handleShowExpensesClick();
+        } else if (userService.currentUser.type === UserTypes.ADMIN) {
+          window.location.replace("#show-users-page");
+          handleShowUsersClick();
+        }
+
+      } else {
+        console.log("Hata: Oturum açma işlemi başarısız.");
+      }
+    };
+  }
+}
+loginSaveButton.addEventListener("click", handleLoginSaveClick);
+
 const handleShowUsersClick = () => {
   window.location.replace("#show-users-page");
   showUsers("#show-users-list");
-};
+}
 showUsersButton.addEventListener("click", handleShowUsersClick);
 
 const handleDeleteUserClick = () => {
@@ -298,13 +313,10 @@ const handleDeleteUserSaveClick = () => {
       e.preventDefault();
       const formData = new FormData(<HTMLFormElement>deleteUserForm);
       const id = formData.get("delete-user-id") as string;
-      if (await userService.deleteUser(Number(id))) {
-        console.log("Kullanıcı silme işlemi başarılı.");
-        handleShowUsersClick();
-        window.location.replace("#show-users-page");
-      } else {
-        console.log("Hata: Kullanıcı silme işlemi başarısız.");
-      }
+      await userService.deleteUser(BigInt(id))
+      console.log("Kullanıcı silme işlemi başarılı.");
+      handleShowUsersClick();
+      window.location.replace("#show-users-page");
     };
   }
 }
@@ -313,7 +325,7 @@ deleteUserSaveButton.addEventListener("click", handleDeleteUserSaveClick);
 const handleShowExpensesClick = () => {
   window.location.replace("#show-expenses-page");
   showUserExpenses("#show-expenses-list");
-};
+}
 showExpensesButton.addEventListener("click", handleShowExpensesClick);
 
 const handleAddExpenseClick = () => {
@@ -321,7 +333,7 @@ const handleAddExpenseClick = () => {
   const addExpenseDate = <HTMLInputElement>document.querySelector("#add-expense-date");
   addExpenseDate.setAttribute("value", (new Date(Date.now())).toString());
   showUserExpenseCategories("#add-expense-show-categories-list");
-};
+}
 addExpenseButton.addEventListener("click", handleAddExpenseClick);
 addExpenseButton2.addEventListener("click", handleAddExpenseClick);
 
@@ -335,7 +347,8 @@ const handleAddExpenseSaveClick = () => {
       const amount = formData.get("add-expense-amount") as string;
       const date = formData.get("add-expense-date") as string;
       const categoryId = formData.get("add-expense-category") as string;
-      if (await expenseService.addExpense(userService.currentUser.id, name, BigInt(amount), new Date(date), Number(categoryId))) {
+      let newExpense = new Expense(BigInt(0), userService.currentUser.id, name, BigInt(amount), new Date(date), BigInt(categoryId));
+      if (await expenseService.addExpense(newExpense)) {
         console.log("Harcama ekleme işlemi başarılı.");
         handleShowExpensesClick();
         window.location.replace("#show-expenses-page");
@@ -344,7 +357,7 @@ const handleAddExpenseSaveClick = () => {
       }
     };
   }
-};
+}
 addExpenseSaveButton.addEventListener("click", handleAddExpenseSaveClick);
 
 const handleEditExpenseClick = () => {
@@ -366,7 +379,8 @@ const handleEditExpenseSaveClick = () => {
       const editedAmount = formData.get("edit-expense-amount") as string;
       const editedDate = formData.get("edit-expense-date") as string;
       const editedCategoryId = formData.get("edit-expense-category-id") as string;
-      if (await expenseService.editExpense(userService.currentUser.id, Number(id), editedName, BigInt(editedAmount), new Date(editedDate), Number(editedCategoryId) )) {
+      let newExpense = new Expense(BigInt(id), userService.currentUser.id, editedName, BigInt(editedAmount), new Date(editedDate), BigInt(editedCategoryId));
+      if (await expenseService.editExpense(newExpense)) {
         console.log("Harcama güncelleme işlemi başarılı.");
         handleShowExpensesClick();
         window.location.replace("#show-expenses-page");
@@ -392,13 +406,10 @@ const handleDeleteExpenseSaveClick = () => {
       e.preventDefault();
       const formData = new FormData(<HTMLFormElement>deleteExpenseForm);
       const id = formData.get("delete-expense-id") as string;
-      if (await expenseService.deleteExpense(userService.currentUser.id, Number(id))) {
-        console.log("Harcama silme işlemi başarılı.");
-        handleShowExpensesClick();
-        window.location.replace("#show-expenses-page");
-      } else {
-        console.log("Hata: Harcama silme işlemi başarısız.");
-      }
+      await expenseService.deleteExpense(userService.currentUser.id, BigInt(id));
+      console.log("Harcama silme işlemi başarılı.");
+      handleShowExpensesClick();
+      window.location.replace("#show-expenses-page");
     };
   }
 }
@@ -407,12 +418,12 @@ deleteExpenseSaveButton.addEventListener("click", handleDeleteExpenseSaveClick);
 const handleShowCategoriesClick = () => {
   window.location.replace("#show-categories-page");
   showUserExpenseCategories("#show-categories-list");
-};
+}
 showCategoriesButton.addEventListener("click", handleShowCategoriesClick);
 
 const handleAddCategoryClick = () => {
   window.location.replace("#add-category-page");
-};
+}
 addCategoryButton.addEventListener("click", handleAddCategoryClick);
 addCategoryButton2.addEventListener("click", handleAddCategoryClick);
 
@@ -423,7 +434,8 @@ const handleAddCategorySaveClick = () => {
       e.preventDefault();
       const formData = new FormData(<HTMLFormElement>addCategoryForm);
       const name = formData.get("add-category-name") as string;
-      if (await expenseCategoryService.addExpenseCategory(userService.currentUser.id, name)) {
+      let newExpenseCategory = new ExpenseCategory(BigInt(0), userService.currentUser.id, name);
+      if (await expenseCategoryService.addExpenseCategory(newExpenseCategory)) {
         console.log("Kategori ekleme işlemi başarılı.");
         handleShowCategoriesClick();
       } else {
@@ -431,7 +443,7 @@ const handleAddCategorySaveClick = () => {
       }
     };
   }
-};
+}
 addCategorySaveButton.addEventListener("click", handleAddCategorySaveClick);
 
 const handleEditCategoryClick = () => {
@@ -449,7 +461,8 @@ const handleEditCategorySaveClick = () => {
       const formData = new FormData(<HTMLFormElement>editCategoryForm);
       const id = formData.get("edit-category-id") as string;
       const editedName = formData.get("edit-category-name") as string;
-      if (await expenseCategoryService.editExpenseCategory(userService.currentUser.id, Number(id), editedName)) {
+      let newExpenseCategory = new ExpenseCategory(BigInt(id), userService.currentUser.id, editedName);
+      if (await expenseCategoryService.editExpenseCategory(newExpenseCategory)) {
         console.log("Kategori güncelleme işlemi başarılı.");
         handleShowCategoriesClick();
         window.location.replace("#show-categories-page");
@@ -475,13 +488,10 @@ const handleDeleteCategorySaveClick = () => {
       e.preventDefault();
       const formData = new FormData(<HTMLFormElement>deleteCategoryForm);
       const id = formData.get("delete-category-id") as string;
-      if (await expenseCategoryService.deleteExpenseCategory(userService.currentUser.id, Number(id))) {
-        console.log("Kategori silme işlemi başarılı.");
-        handleShowCategoriesClick();
-        window.location.replace("#show-categories-page");
-      } else {
-        console.log("Hata: Kategori silme işlemi başarısız.");
-      }
+      await expenseCategoryService.deleteExpenseCategory(userService.currentUser.id, BigInt(id))
+      console.log("Kategori silme işlemi başarılı.");
+      handleShowCategoriesClick();
+      window.location.replace("#show-categories-page");
     };
   }
 }
@@ -520,25 +530,30 @@ const handleEditProfileSaveClick = () => {
       const editedEmail = formData.get("edit-profile-email") as string;
       const editedPassword = formData.get("edit-profile-password") as string;
       const retypedPassword = formData.get("edit-profile-retyped-password") as string;
-      if (await userService.editUser(userService.currentUser.id, editedName, editedSurname, editedEmail, editedPassword, retypedPassword)) {
-        console.log("Kullanıcı güncelleme işlemi başarılı.");
-        handleShowProfileClick();
-        window.location.replace("#show-profile-page");
+      if (checkPasswords(editedPassword, retypedPassword)) {
+        let newUser = new User(userService.currentUser.id, UserTypes.CUSTOMER, editedName, editedSurname, editedEmail, editedPassword);
+        let editedUser = await userService.editUser(newUser);
+        if (editedUser != null) {
+          userService.currentUser = editedUser;
+          console.log("Profil güncelleme işlemi başarılı.");
+          handleShowProfileClick();
+          window.location.replace("#show-profile-page");
+        } else {
+          console.log("Hata: Profil güncelleme işlemi başarısız.");
+        }
       } else {
-        console.log("Hata: Kullanıcı güncelleme işlemi başarısız.");
+        console.log("Hata: Girilen şifreler uyuşmuyor.");
       }
+
     };
   }
 }
 editProfileSaveButton.addEventListener("click", handleEditProfileSaveClick);
 
 const handleLogoutClick = async () => {
-  if (await userService.logout(userService.currentUser.id)) {
-    console.log("Oturum kapatma işlemi başarılı.");
-    refreshMenus();
-    window.location.replace("#");
-  } else {
-    console.log("Hata: Oturum kapatma işlemi başarısız.");
-  }
+  await userService.logout(userService.currentUser)
+  console.log("Oturum kapatma işlemi başarılı.");
+  refreshMenus();
+  window.location.replace("#");
 }
 logoutButton.addEventListener("click", handleLogoutClick);

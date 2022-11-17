@@ -1,7 +1,5 @@
 import { User } from "../domain/user";
-import { UserTypes } from "../enums/userTypes";
-
-import { expenseCategoryService } from "../index";
+import { apiURL } from "../utils/utils";
 
 export class UserService {
     private _currentUser: User;
@@ -12,10 +10,10 @@ export class UserService {
 
     public async getUsers(): Promise<User[]> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/", {
+            const response = await window.fetch(apiURL + "/users/", {
                 method: "GET",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
 
@@ -39,12 +37,12 @@ export class UserService {
         }
     }
 
-    public async getUserById(userId: number): Promise<User> {
+    public async getUserById(userId: bigint): Promise<User> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString(), {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString(), {
                 method: "GET",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
 
@@ -68,19 +66,18 @@ export class UserService {
         }
     }
 
-    public async register(name: string, surname: string, email: string, password: string, retypedPassword: string): Promise<boolean> {
+    public async register(newUser: User): Promise<User> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/register", {
+            const response = await window.fetch(apiURL + "/register", {
                 method: "POST",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    name,
-                    surname,
-                    email,
-                    password,
-                    retypedPassword
+                    'name': newUser.name,
+                    'surname': newUser.surname,
+                    'email': newUser.email,
+                    'password': newUser.password
                 })
             });
 
@@ -91,111 +88,8 @@ export class UserService {
             const result = (await response.json());
 
             // console.log("result is: ", JSON.stringify(result, null, 4));
-
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
-
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log('error message: ', error.message);
-            } else {
-                console.log('unexpected error: ', error);
-            }
-            return false;
-        }
-    }
-
-    public async editUser(id: number, editedName: string, editedSurname: string, editedEmail: string, editedPassword: string, retypedPassword: string): Promise<boolean> {
-        try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + id.toString(), {
-                method: "PUT",
-                headers: {
-                    Accept: "application/json"
-                },
-                body: JSON.stringify({
-                    id,
-                    editedName,
-                    editedSurname,
-                    editedEmail,
-                    editedPassword,
-                    retypedPassword
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`);
-            }
-
-            const result = (await response.json());
-
-            // console.log("result is: ", JSON.stringify(result, null, 4));
-
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
-
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log('error message: ', error.message);
-            } else {
-                console.log('unexpected error: ', error);
-            }
-            return false;
-        }
-    }
-
-    public async deleteUser(id: number): Promise<boolean> {
-        try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + id.toString(), {
-                method: "DELETE",
-                headers: {
-                    Accept: "application/json"
-                },
-                body: JSON.stringify({
-                    id
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`);
-            }
-
-            const result = (await response.json());
-
-            // console.log("result is: ", JSON.stringify(result, null, 4));
-
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
-
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log('error message: ', error.message);
-            } else {
-                console.log('unexpected error: ', error);
-            }
-            return false;
-        }
-    }
-
-
-    public async login(email: string, password: string): Promise<User> {
-        try {
-            const response = await window.fetch("http://localhost:3001/api/v1/login/" + email, {
-                method: "POST",
-                headers: {
-                    Accept: "application/json"
-                },
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`);
-            }
-
-            const result = (await response.json());
 
             this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
-
-            console.log("result is: ", JSON.stringify(result, null, 4));
 
             return <User>JSON.parse(JSON.stringify(result, null, 4));
 
@@ -209,15 +103,20 @@ export class UserService {
         }
     }
 
-    public async logout(id: number): Promise<boolean> {
+    public async editUser(newUser: User): Promise<User> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/logout", {
-                method: "POST",
+            const response = await window.fetch(apiURL + "/users/" + newUser.id.toString(), {
+                method: "PUT",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    id
+                    'id': newUser.id.toString(),
+                    'type': newUser.type,
+                    'name': newUser.name,
+                    'surname': newUser.surname,
+                    'email': newUser.email,
+                    'password': newUser.password
                 })
             });
 
@@ -227,11 +126,9 @@ export class UserService {
 
             const result = (await response.json());
 
-            // console.log("result is: ", JSON.stringify(result, null, 4));
+            console.log( JSON.parse(JSON.stringify(result, null, 4)));
 
-            this.currentUser = null as any;
-
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+            return <User>JSON.parse(JSON.stringify(result, null, 4));
 
         } catch (error) {
             if (error instanceof Error) {
@@ -239,7 +136,93 @@ export class UserService {
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
+            return null as any;
+        }
+    }
+
+    public async deleteUser(id: bigint): Promise<void> {
+        try {
+            const response = await window.fetch(apiURL + "/users/" + id.toString(), {
+                method: "DELETE",
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8'
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+        }
+    }
+
+    public async login(user: User): Promise<User> {
+        try {
+            const response = await window.fetch(apiURL + "/login", {
+                method: "POST",
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    'email': user.email,
+                    'password': user.password
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            const result = (await response.json());
+
+            this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
+
+            console.log(this.currentUser);
+
+            // console.log("result is: ", JSON.stringify(result, null, 4));
+
+            return <User>JSON.parse(JSON.stringify(result, null, 4));
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
+            return null as any;
+        }
+    }
+
+    public async logout(user: User): Promise<void> {
+        try {
+            const response = await window.fetch(apiURL + "/logout", {
+                method: "POST",
+                headers: {
+                    'content-type': 'application/json;charset=UTF-8'
+                },
+                body: JSON.stringify({
+                    user
+                })
+            });
+
+            if (!response.ok) {
+                throw new Error(`Error! status: ${response.status}`);
+            }
+
+            this._currentUser = null as any;
+
+        } catch (error) {
+            if (error instanceof Error) {
+                console.log('error message: ', error.message);
+            } else {
+                console.log('unexpected error: ', error);
+            }
         }
     }
 

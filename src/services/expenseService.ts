@@ -1,16 +1,17 @@
 import { Expense } from "../domain/expense";
+import { apiURL, dateFormatter2 } from "../utils/utils";
 
 export class ExpenseService {
 
     constructor() {
     }
 
-    public async getExpenses(userId: number): Promise<Expense[]> {
+    public async getExpenses(userId: bigint): Promise<Expense[]> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses", {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses", {
                 method: "GET",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
     
@@ -34,18 +35,20 @@ export class ExpenseService {
         }
     }
 
-    public async addExpense(userId: number, name: string, amount: bigint, date: Date, categoryId: number): Promise<boolean> {
+    public async addExpense(newExpense: Expense): Promise<Expense> {
+        console.log(dateFormatter2(newExpense.date).toString());
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses", {
+            const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses", {
                 method: "POST",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    name,
-                    amount: amount.toString(),
-                    date: date.toString(),
-                    categoryId
+                    'userId': newExpense.userId.toString(),
+                    'name': newExpense.name,
+                    'amount': newExpense.amount.toString(),
+                    'date': dateFormatter2(newExpense.date).toString(),
+                    'categoryId': newExpense.categoryId.toString()
                 })
             });
     
@@ -55,9 +58,9 @@ export class ExpenseService {
     
             const result = (await response.json());
     
-            console.log("result is: ", JSON.stringify(result, null, 4));
+            // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+            return <Expense>JSON.parse(JSON.stringify(result, null, 4));
     
         } catch (error) {
             if (error instanceof Error) {
@@ -65,24 +68,24 @@ export class ExpenseService {
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
+            return null as any;
         }
     }
 
-    public async editExpense(userId: number, id: number, editedName: string, editedAmount: bigint, editedDate: Date, editedCategoryId: number): Promise<boolean> {
+    public async editExpense(newExpense: Expense): Promise<Expense> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses/" + newExpense.id.toString(), {
                 method: "PUT",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    userId,
-                    id,
-                    editedName,
-                    editedAmount: editedAmount.toString(),
-                    editedDate: editedDate.toString(),
-                    editedCategoryId
+                    'id': newExpense.id.toString(),
+                    'userId': newExpense.userId.toString(),
+                    'name': newExpense.name,
+                    'amount': newExpense.amount.toString(),
+                    'date': dateFormatter2(newExpense.date).toString(),
+                    'categoryId': newExpense.categoryId.toString()
                 })
             });
     
@@ -94,7 +97,7 @@ export class ExpenseService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
+            return <Expense>JSON.parse(JSON.stringify(result, null, 4));
     
         } catch (error) {
             if (error instanceof Error) {
@@ -102,39 +105,29 @@ export class ExpenseService {
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
+            return null as any;
         }
     }
 
-    public async deleteExpense(userId: number, id: number): Promise<boolean> {
+    public async deleteExpense(userId: bigint, id: bigint): Promise<void> {
         try {
-            const response = await window.fetch("http://localhost:3001/api/v1/users/" + userId.toString() + "/expenses/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    Accept: "application/json"
-                },
-                body: JSON.stringify({
-                    id
-                })
+                    'content-type': 'application/json;charset=UTF-8'
+                }
             });
     
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
             }
-    
-            const result = (await response.json());
-    
-            // console.log("result is: ", JSON.stringify(result, null, 4));
-    
-            return <boolean>JSON.parse(JSON.stringify(result, null, 4));
-    
+         
         } catch (error) {
             if (error instanceof Error) {
                 console.log('error message: ', error.message);
             } else {
                 console.log('unexpected error: ', error);
             }
-            return false;
         }
     }
 

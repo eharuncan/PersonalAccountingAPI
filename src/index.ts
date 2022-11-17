@@ -7,6 +7,7 @@ import { UserTypes } from "./enums/userTypes";
 import { User } from "./domain/user";
 import { Expense } from "./domain/expense";
 import { ExpenseCategory } from "./domain/expenseCategory";
+import { dateFormatter, dateFormatter2 } from "./utils/utils";
 
 export let expenseCategoryService: ExpenseCategoryService;
 export let userService: UserService;
@@ -182,7 +183,7 @@ async function showUserExpenses(elementId: string) {
     userExpenseList.appendChild(divElementAmount);
 
     let divElementDate = document.createElement("div");
-    divElementDate.innerText = userExpenses[index].date.toString();
+    divElementDate.innerText = dateFormatter(userExpenses[index].date).toString();
     userExpenseList.appendChild(divElementDate);
 
     let divElementCategory = document.createElement("div");
@@ -242,14 +243,16 @@ const handleRegisterSaveClick = () => {
       const email = formData.get("register-email") as string;
       const password = formData.get("register-password") as string;
       const retypedPassword = formData.get("register-retyped-password") as string;
-      let newUser = new User(name, surname, email, password);
-      if (await userService.register(newUser) != null) {
-        console.log("Kayıt işlemi başarılı.");
-        refreshMenus();
-        window.location.replace("#show-expenses-page");
-        handleShowExpensesClick();
-      } else {
-        console.log("Hata: Kayıt işlemi başarısız.");
+      if (checkPasswords(password, retypedPassword)) {
+        let newUser = new User(BigInt(0), UserTypes.CUSTOMER, name, surname, email, password);
+        if (await userService.register(newUser) != null) {
+          console.log("Kayıt işlemi başarılı.");
+          refreshMenus();
+          window.location.replace("#show-expenses-page");
+          handleShowExpensesClick();
+        } else {
+          console.log("Hata: Kayıt işlemi başarısız.");
+        }
       }
     };
   }
@@ -269,7 +272,7 @@ const handleLoginSaveClick = () => {
       const formData = new FormData(<HTMLFormElement>loginForm);
       const email = formData.get("login-email") as string;
       const password = formData.get("login-password") as string;
-      let newUser = new User("", "", email, password);
+      let newUser = new User(BigInt(0), UserTypes.CUSTOMER, "", "", email, password);
 
       if (await userService.login(newUser) != null) {
         console.log("Oturum açma işlemi başarılı.");
@@ -344,7 +347,7 @@ const handleAddExpenseSaveClick = () => {
       const amount = formData.get("add-expense-amount") as string;
       const date = formData.get("add-expense-date") as string;
       const categoryId = formData.get("add-expense-category") as string;
-      let newExpense = new Expense(userService.currentUser.id, name, BigInt(amount), new Date(date), BigInt(categoryId));
+      let newExpense = new Expense(BigInt(0), userService.currentUser.id, name, BigInt(amount), new Date(date), BigInt(categoryId));
       if (await expenseService.addExpense(newExpense)) {
         console.log("Harcama ekleme işlemi başarılı.");
         handleShowExpensesClick();
@@ -376,7 +379,7 @@ const handleEditExpenseSaveClick = () => {
       const editedAmount = formData.get("edit-expense-amount") as string;
       const editedDate = formData.get("edit-expense-date") as string;
       const editedCategoryId = formData.get("edit-expense-category-id") as string;
-      let newExpense = new Expense(userService.currentUser.id, editedName, BigInt(editedAmount), new Date(editedDate), BigInt(editedCategoryId));
+      let newExpense = new Expense(BigInt(id), userService.currentUser.id, editedName, BigInt(editedAmount), new Date(editedDate), BigInt(editedCategoryId));
       if (await expenseService.editExpense(newExpense)) {
         console.log("Harcama güncelleme işlemi başarılı.");
         handleShowExpensesClick();
@@ -431,7 +434,7 @@ const handleAddCategorySaveClick = () => {
       e.preventDefault();
       const formData = new FormData(<HTMLFormElement>addCategoryForm);
       const name = formData.get("add-category-name") as string;
-      let newExpenseCategory = new ExpenseCategory(userService.currentUser.id, name);
+      let newExpenseCategory = new ExpenseCategory(BigInt(0), userService.currentUser.id, name);
       if (await expenseCategoryService.addExpenseCategory(newExpenseCategory)) {
         console.log("Kategori ekleme işlemi başarılı.");
         handleShowCategoriesClick();
@@ -458,7 +461,7 @@ const handleEditCategorySaveClick = () => {
       const formData = new FormData(<HTMLFormElement>editCategoryForm);
       const id = formData.get("edit-category-id") as string;
       const editedName = formData.get("edit-category-name") as string;
-      let newExpenseCategory = new ExpenseCategory(userService.currentUser.id, editedName);
+      let newExpenseCategory = new ExpenseCategory(BigInt(id), userService.currentUser.id, editedName);
       if (await expenseCategoryService.editExpenseCategory(newExpenseCategory)) {
         console.log("Kategori güncelleme işlemi başarılı.");
         handleShowCategoriesClick();
@@ -528,13 +531,15 @@ const handleEditProfileSaveClick = () => {
       const editedPassword = formData.get("edit-profile-password") as string;
       const retypedPassword = formData.get("edit-profile-retyped-password") as string;
       if (checkPasswords(editedPassword, retypedPassword)) {
-        let newUser = new User(editedName, editedSurname, editedEmail, editedPassword);
-        if (await userService.editUser(newUser)) {
-          console.log("Kullanıcı güncelleme işlemi başarılı.");
+        let newUser = new User(userService.currentUser.id, UserTypes.CUSTOMER, editedName, editedSurname, editedEmail, editedPassword);
+        let editedUser = await userService.editUser(newUser);
+        if (editedUser != null) {
+          userService.currentUser = editedUser;
+          console.log("Profil güncelleme işlemi başarılı.");
           handleShowProfileClick();
           window.location.replace("#show-profile-page");
         } else {
-          console.log("Hata: Kullanıcı güncelleme işlemi başarısız.");
+          console.log("Hata: Profil güncelleme işlemi başarısız.");
         }
       } else {
         console.log("Hata: Girilen şifreler uyuşmuyor.");

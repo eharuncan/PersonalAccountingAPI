@@ -1,5 +1,5 @@
 import { Expense } from "../domain/expense";
-import { apiURL } from "../utils/utils";
+import { apiURL, dateFormatter2 } from "../utils/utils";
 
 export class ExpenseService {
 
@@ -11,7 +11,7 @@ export class ExpenseService {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses", {
                 method: "GET",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
     
@@ -36,14 +36,19 @@ export class ExpenseService {
     }
 
     public async addExpense(newExpense: Expense): Promise<Expense> {
+        console.log(dateFormatter2(newExpense.date).toString());
         try {
             const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses", {
                 method: "POST",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    newExpense
+                    'userId': newExpense.userId.toString(),
+                    'name': newExpense.name,
+                    'amount': newExpense.amount.toString(),
+                    'date': dateFormatter2(newExpense.date).toString(),
+                    'categoryId': newExpense.categoryId.toString()
                 })
             });
     
@@ -69,13 +74,18 @@ export class ExpenseService {
 
     public async editExpense(newExpense: Expense): Promise<Expense> {
         try {
-            const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses/" + newExpense.id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses/" + newExpense.id.toString(), {
                 method: "PUT",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    newExpense
+                    'id': newExpense.id.toString(),
+                    'userId': newExpense.userId.toString(),
+                    'name': newExpense.name,
+                    'amount': newExpense.amount.toString(),
+                    'date': dateFormatter2(newExpense.date).toString(),
+                    'categoryId': newExpense.categoryId.toString()
                 })
             });
     
@@ -101,21 +111,17 @@ export class ExpenseService {
 
     public async deleteExpense(userId: bigint, id: bigint): Promise<void> {
         try {
-            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses/" + id.toString, {
+            const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
     
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
             }
-    
-            const result = (await response.json());
-    
-            // console.log("result is: ", JSON.stringify(result, null, 4));
-        
+         
         } catch (error) {
             if (error instanceof Error) {
                 console.log('error message: ', error.message);

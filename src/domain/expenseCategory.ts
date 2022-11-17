@@ -4,7 +4,8 @@ export class ExpenseCategory {
     private _id: bigint;
     private _name: string;
 
-    constructor(userId: bigint, name: string) {
+    constructor(id: bigint, userId: bigint, name: string) {
+        this._id = id;
         this._userId = userId;
         this._name = name;
     }

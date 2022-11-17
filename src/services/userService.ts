@@ -13,7 +13,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/", {
                 method: "GET",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
 
@@ -42,7 +42,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/" + userId.toString(), {
                 method: "GET",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
 
@@ -71,10 +71,13 @@ export class UserService {
             const response = await window.fetch(apiURL + "/register", {
                 method: "POST",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    newUser
+                    'name': newUser.name,
+                    'surname': newUser.surname,
+                    'email': newUser.email,
+                    'password': newUser.password
                 })
             });
 
@@ -105,10 +108,15 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/" + newUser.id.toString(), {
                 method: "PUT",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    newUser
+                    'id': newUser.id.toString(),
+                    'type': newUser.type,
+                    'name': newUser.name,
+                    'surname': newUser.surname,
+                    'email': newUser.email,
+                    'password': newUser.password
                 })
             });
 
@@ -118,7 +126,7 @@ export class UserService {
 
             const result = (await response.json());
 
-            // console.log("result is: ", JSON.stringify(result, null, 4));
+            console.log( JSON.parse(JSON.stringify(result, null, 4)));
 
             return <User>JSON.parse(JSON.stringify(result, null, 4));
 
@@ -137,17 +145,13 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 }
             });
 
             if (!response.ok) {
                 throw new Error(`Error! status: ${response.status}`);
             }
-
-            const result = (await response.json());
-
-            // console.log("result is: ", JSON.stringify(result, null, 4));
 
         } catch (error) {
             if (error instanceof Error) {
@@ -163,10 +167,11 @@ export class UserService {
             const response = await window.fetch(apiURL + "/login", {
                 method: "POST",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
-                    user
+                    'email': user.email,
+                    'password': user.password
                 })
             });
 
@@ -177,6 +182,8 @@ export class UserService {
             const result = (await response.json());
 
             this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
+
+            console.log(this.currentUser);
 
             // console.log("result is: ", JSON.stringify(result, null, 4));
 
@@ -197,7 +204,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/logout", {
                 method: "POST",
                 headers: {
-                    Accept: "application/json"
+                    'content-type': 'application/json;charset=UTF-8'
                 },
                 body: JSON.stringify({
                     user
@@ -208,11 +215,7 @@ export class UserService {
                 throw new Error(`Error! status: ${response.status}`);
             }
 
-            const result = (await response.json());
-
-            // console.log("result is: ", JSON.stringify(result, null, 4));
-
-            this.currentUser = null as any;
+            this._currentUser = null as any;
 
         } catch (error) {
             if (error instanceof Error) {

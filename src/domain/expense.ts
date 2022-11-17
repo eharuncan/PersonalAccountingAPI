@@ -7,7 +7,8 @@ export class Expense {
     private _date: Date;
     private _categoryId: bigint;
 
-    constructor(userId: bigint, name: string, amount: bigint, date: Date, categoryId: bigint) {
+    constructor(id: bigint, userId: bigint, name: string, amount: bigint, date: Date, categoryId: bigint) {
+        this._id = id,
         this._userId = userId;
         this._name = name;
         this._amount = amount;

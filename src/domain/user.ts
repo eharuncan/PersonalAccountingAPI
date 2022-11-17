@@ -9,10 +9,12 @@ export class User {
     private _email: string;
     private _password: string;
 
-    constructor(name: string, surname: string, email: string, password: string) {
+    constructor(id: bigint, type: UserTypes, name: string, surname: string, email: string, password: string) {
+        this._id = id;
+        this._type = type;
         this._name = name;
         this._surname = surname;
-        this._email = email;
+        this.email = email;
         this._password = password;
     }
 

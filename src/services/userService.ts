@@ -13,7 +13,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/", {
                 method: "GET",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 }
             });
 
@@ -25,36 +25,7 @@ export class UserService {
 
             // console.log("result is: ", JSON.stringify(result, null, 4));
 
-            return <User[]>JSON.parse(JSON.stringify(result, null, 4));
-
-        } catch (error) {
-            if (error instanceof Error) {
-                console.log('error message: ', error.message);
-            } else {
-                console.log('unexpected error: ', error);
-            }
-            return null as any;
-        }
-    }
-
-    public async getUserById(userId: bigint): Promise<User> {
-        try {
-            const response = await window.fetch(apiURL + "/users/" + userId.toString(), {
-                method: "GET",
-                headers: {
-                    'content-type': 'application/json;charset=UTF-8'
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error(`Error! status: ${response.status}`);
-            }
-
-            const result = (await response.json());
-
-            // console.log("result is: ", JSON.stringify(result, null, 4));
-
-            return <User>JSON.parse(JSON.stringify(result, null, 4));
+            return <User[]>result;
 
         } catch (error) {
             if (error instanceof Error) {
@@ -71,7 +42,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/register", {
                 method: "POST",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     'name': newUser.name,
@@ -91,7 +62,7 @@ export class UserService {
 
             this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
 
-            return <User>JSON.parse(JSON.stringify(result, null, 4));
+            return <User>result;
 
         } catch (error) {
             if (error instanceof Error) {
@@ -108,7 +79,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/" + newUser.id.toString(), {
                 method: "PUT",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 },
                 body: JSON.stringify({
                     'id': newUser.id.toString(),
@@ -128,7 +99,7 @@ export class UserService {
 
             console.log( JSON.parse(JSON.stringify(result, null, 4)));
 
-            return <User>JSON.parse(JSON.stringify(result, null, 4));
+            return <User>result;
 
         } catch (error) {
             if (error instanceof Error) {
@@ -145,7 +116,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 }
             });
 
@@ -167,7 +138,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/login", {
                 method: "POST",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     'email': user.email,
@@ -181,13 +152,13 @@ export class UserService {
 
             const result = (await response.json());
 
-            this.currentUser = <User>JSON.parse(JSON.stringify(result, null, 4));
+            this.currentUser = <User>result;
 
             console.log(this.currentUser);
 
             // console.log("result is: ", JSON.stringify(result, null, 4));
 
-            return <User>JSON.parse(JSON.stringify(result, null, 4));
+            return <User>result;
 
         } catch (error) {
             if (error instanceof Error) {
@@ -204,7 +175,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/logout", {
                 method: "POST",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     user

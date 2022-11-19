@@ -168,7 +168,7 @@ async function showUserExpenses(elementId: string) {
   divElementCategory.innerText = "Kategorisi";
   userExpenseList.appendChild(divElementCategory);
 
-  let userExpenses = await expenseService.getExpenses(userService.currentUser.id);
+  let userExpenses = await expenseService.getExpensesOfUser(userService.currentUser.id);
   for (let index = 0; index < userExpenses.length; index++) {
     let divElementId = document.createElement("div");
     divElementId.innerText = userExpenses[index].id.toString();
@@ -187,7 +187,7 @@ async function showUserExpenses(elementId: string) {
     userExpenseList.appendChild(divElementDate);
 
     let divElementCategory = document.createElement("div");
-    divElementCategory.innerText = (await expenseCategoryService.getExpenseCategoryByUserIdAndExpenseCategoryId(userService.currentUser.id, userExpenses[index].categoryId)).name;
+    divElementCategory.innerText = (await expenseCategoryService.getExpenseCategoryOfUser(userService.currentUser.id, userExpenses[index].categoryId)).name;
     userExpenseList.appendChild(divElementCategory);
   }
 }
@@ -195,7 +195,7 @@ async function showUserExpenses(elementId: string) {
 async function showUserExpenseCategories(elementId: string) {
   const userCategoryList = <HTMLDivElement>document.querySelector(elementId);
   removeAllChildNodes(userCategoryList);
-  let userCategories = await expenseCategoryService.getExpenseCategoriesByUserId(userService.currentUser.id);
+  let userCategories = await expenseCategoryService.getExpenseCategoriesOfUser(userService.currentUser.id);
 
   let divElementId = document.createElement("div");
   divElementId.innerText = "Kategori ID";
@@ -348,7 +348,7 @@ const handleAddExpenseSaveClick = () => {
       const date = formData.get("add-expense-date") as string;
       const categoryId = formData.get("add-expense-category") as string;
       let newExpense = new Expense(BigInt(0), userService.currentUser.id, name, BigInt(amount), new Date(date), BigInt(categoryId));
-      if (await expenseService.addExpense(newExpense)) {
+      if (await expenseService.addExpenseOfUser(newExpense)) {
         console.log("Harcama ekleme işlemi başarılı.");
         handleShowExpensesClick();
         window.location.replace("#show-expenses-page");
@@ -380,7 +380,7 @@ const handleEditExpenseSaveClick = () => {
       const editedDate = formData.get("edit-expense-date") as string;
       const editedCategoryId = formData.get("edit-expense-category-id") as string;
       let newExpense = new Expense(BigInt(id), userService.currentUser.id, editedName, BigInt(editedAmount), new Date(editedDate), BigInt(editedCategoryId));
-      if (await expenseService.editExpense(newExpense)) {
+      if (await expenseService.editExpenseOfUser(newExpense)) {
         console.log("Harcama güncelleme işlemi başarılı.");
         handleShowExpensesClick();
         window.location.replace("#show-expenses-page");
@@ -406,7 +406,7 @@ const handleDeleteExpenseSaveClick = () => {
       e.preventDefault();
       const formData = new FormData(<HTMLFormElement>deleteExpenseForm);
       const id = formData.get("delete-expense-id") as string;
-      await expenseService.deleteExpense(userService.currentUser.id, BigInt(id));
+      await expenseService.deleteExpenseOfUser(userService.currentUser.id, BigInt(id));
       console.log("Harcama silme işlemi başarılı.");
       handleShowExpensesClick();
       window.location.replace("#show-expenses-page");
@@ -435,7 +435,7 @@ const handleAddCategorySaveClick = () => {
       const formData = new FormData(<HTMLFormElement>addCategoryForm);
       const name = formData.get("add-category-name") as string;
       let newExpenseCategory = new ExpenseCategory(BigInt(0), userService.currentUser.id, name);
-      if (await expenseCategoryService.addExpenseCategory(newExpenseCategory)) {
+      if (await expenseCategoryService.addExpenseCategoryOfUser(newExpenseCategory)) {
         console.log("Kategori ekleme işlemi başarılı.");
         handleShowCategoriesClick();
       } else {
@@ -462,7 +462,7 @@ const handleEditCategorySaveClick = () => {
       const id = formData.get("edit-category-id") as string;
       const editedName = formData.get("edit-category-name") as string;
       let newExpenseCategory = new ExpenseCategory(BigInt(id), userService.currentUser.id, editedName);
-      if (await expenseCategoryService.editExpenseCategory(newExpenseCategory)) {
+      if (await expenseCategoryService.editExpenseCategoryOfUser(newExpenseCategory)) {
         console.log("Kategori güncelleme işlemi başarılı.");
         handleShowCategoriesClick();
         window.location.replace("#show-categories-page");
@@ -488,7 +488,7 @@ const handleDeleteCategorySaveClick = () => {
       e.preventDefault();
       const formData = new FormData(<HTMLFormElement>deleteCategoryForm);
       const id = formData.get("delete-category-id") as string;
-      await expenseCategoryService.deleteExpenseCategory(userService.currentUser.id, BigInt(id))
+      await expenseCategoryService.deleteExpenseCategoryOfUser(userService.currentUser.id, BigInt(id))
       console.log("Kategori silme işlemi başarılı.");
       handleShowCategoriesClick();
       window.location.replace("#show-categories-page");

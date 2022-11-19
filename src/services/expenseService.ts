@@ -6,12 +6,12 @@ export class ExpenseService {
     constructor() {
     }
 
-    public async getExpenses(userId: bigint): Promise<Expense[]> {
+    public async getExpensesOfUser(userId: bigint): Promise<Expense[]> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses", {
                 method: "GET",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'Content-Type': 'application/json'
                 }
             });
     
@@ -23,7 +23,7 @@ export class ExpenseService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <Expense[]>JSON.parse(JSON.stringify(result, null, 4));
+            return <Expense[]>result;
     
         } catch (error) {
             if (error instanceof Error) {
@@ -35,13 +35,13 @@ export class ExpenseService {
         }
     }
 
-    public async addExpense(newExpense: Expense): Promise<Expense> {
+    public async addExpenseOfUser(newExpense: Expense): Promise<Expense> {
         console.log(dateFormatter2(newExpense.date).toString());
         try {
             const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses", {
                 method: "POST",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 },
                 body: JSON.stringify({
                     'userId': newExpense.userId.toString(),
@@ -60,7 +60,7 @@ export class ExpenseService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <Expense>JSON.parse(JSON.stringify(result, null, 4));
+            return <Expense>result;
     
         } catch (error) {
             if (error instanceof Error) {
@@ -72,12 +72,12 @@ export class ExpenseService {
         }
     }
 
-    public async editExpense(newExpense: Expense): Promise<Expense> {
+    public async editExpenseOfUser(newExpense: Expense): Promise<Expense> {
         try {
             const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses/" + newExpense.id.toString(), {
                 method: "PUT",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 },
                 body: JSON.stringify({
                     'id': newExpense.id.toString(),
@@ -97,7 +97,7 @@ export class ExpenseService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <Expense>JSON.parse(JSON.stringify(result, null, 4));
+            return <Expense>result;
     
         } catch (error) {
             if (error instanceof Error) {
@@ -109,12 +109,12 @@ export class ExpenseService {
         }
     }
 
-    public async deleteExpense(userId: bigint, id: bigint): Promise<void> {
+    public async deleteExpenseOfUser(userId: bigint, id: bigint): Promise<void> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 }
             });
     

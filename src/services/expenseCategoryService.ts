@@ -6,12 +6,12 @@ export class ExpenseCategoryService {
     constructor() {
     }
 
-    public async getExpenseCategoriesByUserId(userId: bigint): Promise<ExpenseCategory[]> {
+    public async getExpenseCategoriesOfUser(userId: bigint): Promise<ExpenseCategory[]> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories", {
                 method: "GET",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 }
             });
     
@@ -23,7 +23,7 @@ export class ExpenseCategoryService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <ExpenseCategory[]>JSON.parse(JSON.stringify(result, null, 4));
+            return <ExpenseCategory[]>result;
     
         } catch (error) {
             if (error instanceof Error) {
@@ -35,12 +35,12 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async getExpenseCategoryByUserIdAndExpenseCategoryId(userId: bigint, id: bigint): Promise<ExpenseCategory> {
+    public async getExpenseCategoryOfUser(userId: bigint, id: bigint): Promise<ExpenseCategory> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString(), {
                 method: "GET",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 }
             });
     
@@ -52,7 +52,7 @@ export class ExpenseCategoryService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <ExpenseCategory>JSON.parse(JSON.stringify(result, null, 4));
+            return <ExpenseCategory>result;
     
         } catch (error) {
             if (error instanceof Error) {
@@ -64,12 +64,12 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async addExpenseCategory(newExpenseCategory: ExpenseCategory): Promise<ExpenseCategory> {
+    public async addExpenseCategoryOfUser(newExpenseCategory: ExpenseCategory): Promise<ExpenseCategory> {
         try {
             const response = await window.fetch(apiURL + "/users/" + newExpenseCategory.userId.toString() + "/categories", {
                 method: "POST",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 },
                 body: JSON.stringify({
                     'userId': newExpenseCategory.userId.toString(),
@@ -85,7 +85,7 @@ export class ExpenseCategoryService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <ExpenseCategory>JSON.parse(JSON.stringify(result, null, 4));
+            return <ExpenseCategory>result;
     
         } catch (error) {
             if (error instanceof Error) {
@@ -97,13 +97,13 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async editExpenseCategory(newExpenseCategory: ExpenseCategory): Promise<ExpenseCategory> {
+    public async editExpenseCategoryOfUser(newExpenseCategory: ExpenseCategory): Promise<ExpenseCategory> {
         console.log(newExpenseCategory);
         try {
             const response = await window.fetch(apiURL + "/users/" + newExpenseCategory.userId.toString() + "/categories/" + newExpenseCategory.id.toString(), {
                 method: "PUT",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 },
                 body: JSON.stringify({
                     'id': newExpenseCategory.id.toString(),
@@ -120,7 +120,7 @@ export class ExpenseCategoryService {
     
             // console.log("result is: ", JSON.stringify(result, null, 4));
     
-            return <ExpenseCategory>JSON.parse(JSON.stringify(result, null, 4));
+            return <ExpenseCategory>result;
     
         } catch (error) {
             if (error instanceof Error) {
@@ -132,12 +132,12 @@ export class ExpenseCategoryService {
         }
     }
 
-    public async deleteExpenseCategory(userId: bigint, id: bigint): Promise<void> {
+    public async deleteExpenseCategoryOfUser(userId: bigint, id: bigint): Promise<void> {
         try {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    'content-type': 'application/json;charset=UTF-8'
+                    'content-type': 'application/json'
                 }
             });
     

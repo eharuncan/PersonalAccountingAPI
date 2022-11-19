@@ -41,6 +41,4 @@ If all the steps are done correctly the counter-example  show be rendered  in yo
 
 You can use Mockoon (https://mockoon.com/) mock server for backend API
   
-Import this backup file and start your backend mock server:
-  
-mockoon-backup.json
+Import this backup file (mockoon-backup.json) and start your backend mock server.

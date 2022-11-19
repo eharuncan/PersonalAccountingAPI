@@ -13,7 +13,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/", {
                 method: "GET",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 }
             });
 
@@ -79,7 +79,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/" + newUser.id.toString(), {
                 method: "PUT",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     'id': newUser.id.toString(),
@@ -116,7 +116,7 @@ export class UserService {
             const response = await window.fetch(apiURL + "/users/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 }
             });
 

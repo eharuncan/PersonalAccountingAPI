@@ -11,7 +11,7 @@ export class ExpenseCategoryService {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories", {
                 method: "GET",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 }
             });
     
@@ -40,7 +40,7 @@ export class ExpenseCategoryService {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString(), {
                 method: "GET",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 }
             });
     
@@ -69,7 +69,7 @@ export class ExpenseCategoryService {
             const response = await window.fetch(apiURL + "/users/" + newExpenseCategory.userId.toString() + "/categories", {
                 method: "POST",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     'userId': newExpenseCategory.userId.toString(),
@@ -103,7 +103,7 @@ export class ExpenseCategoryService {
             const response = await window.fetch(apiURL + "/users/" + newExpenseCategory.userId.toString() + "/categories/" + newExpenseCategory.id.toString(), {
                 method: "PUT",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     'id': newExpenseCategory.id.toString(),
@@ -137,7 +137,7 @@ export class ExpenseCategoryService {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/categories/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 }
             });
     

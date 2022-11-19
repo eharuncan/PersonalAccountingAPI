@@ -41,7 +41,7 @@ export class ExpenseService {
             const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses", {
                 method: "POST",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     'userId': newExpense.userId.toString(),
@@ -77,7 +77,7 @@ export class ExpenseService {
             const response = await window.fetch(apiURL + "/users/" + newExpense.userId.toString() + "/expenses/" + newExpense.id.toString(), {
                 method: "PUT",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     'id': newExpense.id.toString(),
@@ -114,7 +114,7 @@ export class ExpenseService {
             const response = await window.fetch(apiURL + "/users/" + userId.toString() + "/expenses/" + id.toString(), {
                 method: "DELETE",
                 headers: {
-                    'content-type': 'application/json'
+                    'Content-Type': 'application/json'
                 }
             });
     

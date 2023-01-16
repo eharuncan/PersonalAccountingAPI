@@ -27,7 +27,7 @@ This will run the start script in the package.json (this runs webpack --watch wh
 
 You can start your browser with this command to disable CORS. Because the application is sending localhost api requests to communicate with the API.
 ```
-chromium-browser --disable-web-security --user-data-dir="/home/[YOUR-USERNAME]/test"
+chromium-browser --disable-web-security --user-data-dir="/tmp/chromium-profile"
 ```
 
 Open: http://localhost:5500/public/ (if you are using visual studio code as your text editor use liveserver extension)

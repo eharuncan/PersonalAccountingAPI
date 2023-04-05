@@ -1,5 +1,7 @@
 # example-personal-accounting-webclient
-An Example Web Client for learning Mock Services
+An Example Web Client 
+
+includes Mock Services
 
 which uses HTML, CSS and TypeScript
 

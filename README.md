@@ -1,4 +1,4 @@
-# example-personal-accounting-webclient
+# example-personal-accounting-web-client
 An Example Web Client 
 
 includes Mock Services
